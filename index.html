@@ -167,7 +167,7 @@
                 <div class="glass-panel rounded-2xl p-6 relative overflow-hidden text-center sticky top-6">
                     <!-- Player UI -->
                     <div class="relative w-48 h-48 mx-auto mb-6">
-                        <div id="record-logo" class="w-full h-full rounded-full border-4 border-gold-500 overflow-hidden shadow-[0_0_30px_rgba(212,175,55,0.4)] pause-animation animate-spin-slow">
+                        <div id="record-logo-container" class="w-full h-full rounded-full border-4 border-gold-500 overflow-hidden shadow-[0_0_30px_rgba(212,175,55,0.4)] pause-animation animate-spin-slow">
                             <img id="logo-img" src="" alt="شعار القارئ" class="w-full h-full object-cover">
                         </div>
                         <div class="absolute inset-0 m-auto w-10 h-10 bg-dark-900 rounded-full border-2 border-gold-500"></div>
@@ -480,8 +480,8 @@
                             </div>
                             <div class="flex gap-2">
                                 <select id="trk-cat" required class="w-full px-3 py-2 rounded bg-dark-800 border border-dark-500 text-white focus:border-gold-500 outline-none text-sm"></select>
-                                <button type="submit" id="trk-submit" class="bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold px-4 rounded text-sm whitespace-nowrap"><i class="fas fa-plus"></i></button>
-                                <button type="button" onclick="resetTrackForm()" class="bg-dark-600 hover:bg-dark-500 text-white font-bold px-3 rounded hidden" id="trk-cancel"><i class="fas fa-times"></i></button>
+                                <button type="submit" id="trk-submit" class="bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold px-4 text-sm whitespace-nowrap rounded"><i class="fas fa-plus"></i> إضافة</button>
+                                <button type="button" onclick="resetTrackForm()" class="bg-dark-600 hover:bg-dark-500 text-white font-bold px-3 hidden rounded" id="trk-cancel"><i class="fas fa-times"></i></button>
                             </div>
                         </form>
                         
@@ -638,6 +638,13 @@
     </script>
 
     <script>
+        // تعريف المتغيرات الأساسية للواجهة لتجنب أي أخطاء (Uncaught ReferenceError)
+        const recordLogo = document.getElementById('record-logo-container');
+        const playIcon = document.getElementById('play-icon');
+        const seekBar = document.getElementById('seek-bar');
+        const curTimeEl = document.getElementById('current-time');
+        const durEl = document.getElementById('duration');
+
         // ==========================================
         // 1. DATA STRUCTURE, SANITIZATION & GLOBAL
         // ==========================================
@@ -675,9 +682,11 @@
 
         let appData = sanitizeData(JSON.parse(localStorage.getItem('quran_pro_data_v4')));
         let userFavorites = JSON.parse(localStorage.getItem('quran_user_favorites_v1')) || []; 
-        let currentTrackId = null; let currentPlaylistContext = 'category'; let isPlaying = false; let globalVisitorCount = '---';
+        let currentTrackId = null; 
+        let currentPlaylistContext = 'category'; 
+        let isPlaying = false; 
+        let globalVisitorCount = '---';
         
-        // المتغيرات الجديدة للتحميل التدريجي (Lazy Load)
         window.catLimits = {}; 
         const ITEMS_PER_PAGE = 100;
 
@@ -689,16 +698,55 @@
             if (window.firebaseSaveData) window.firebaseSaveData(appData);
         }
 
-        window.updateAppDataFromFirebase = function(newData) {
-            if (newData) {
-                appData = sanitizeData(newData);
-                localStorage.setItem('quran_pro_data_v4', JSON.stringify(appData));
-                applySettings(); updateStats();
-                const s = document.getElementById('search-input'); renderPlaylist(s ? s.value : '', false);
-                if (!document.getElementById('dashboard-modal').classList.contains('hidden')) { renderAdminCats(); renderAdminTracks(); }
-            }
-        };
+        // ==========================================
+        // 2. AUDIO & ADHAN & INTRO
+        // ==========================================
+        const mainAudioEl = document.getElementById('main-audio');
+        const fallbackAudioEl = document.getElementById('fallback-audio');
+        const adhanAudioEl = document.getElementById('adhan-audio');
+        const introAudioEl = document.getElementById('intro-audio');
+        let activeAudio = mainAudioEl;
 
+        function bindAudioEvents(audio) {
+            audio.addEventListener('play', (e) => { if(e.target===activeAudio) updatePlayState(); });
+            audio.addEventListener('pause', (e) => { if(e.target===activeAudio) updatePlayState(); });
+            audio.addEventListener('timeupdate', (e) => { 
+                if(e.target === activeAudio && activeAudio.duration) { 
+                    if(seekBar) seekBar.value = (activeAudio.currentTime / activeAudio.duration) * 100; 
+                    if(curTimeEl) curTimeEl.textContent = fmt(activeAudio.currentTime); 
+                } 
+            });
+            audio.addEventListener('loadedmetadata', (e) => { 
+                if(e.target === activeAudio && durEl) durEl.textContent = fmt(activeAudio.duration); 
+            });
+            audio.addEventListener('ended', (e) => { 
+                if(e.target === activeAudio) handleTrackEnded(); 
+            });
+        }
+        bindAudioEvents(mainAudioEl); 
+        bindAudioEvents(fallbackAudioEl);
+
+        let prayerTimings = null; let lastPlayedAdhan = null; let resumeMainAudioAfterAdhan = false;
+        
+        async function fetchPrayerTimes() {
+            if(!appData.settings.enableAdhan) return;
+            try {
+                const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=Cairo&country=Egypt&method=5`);
+                prayerTimings = (await res.json()).data.timings;
+            } catch(e) { }
+        }
+        
+        function checkPrayerTimes() {
+            if(!appData.settings.enableAdhan || !prayerTimings) return;
+            const now = new Date(); const currentHHMM = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            const prayers = { 'Fajr':'الفجر', 'Dhuhr':'الظهر', 'Asr':'العصر', 'Maghrib':'المغرب', 'Isha':'العشاء' };
+            for(let p in prayers) {
+                if(prayerTimings[p] === currentHHMM && lastPlayedAdhan !== currentHHMM) {
+                    lastPlayedAdhan = currentHHMM; triggerAdhan(prayers[p]); break;
+                }
+            }
+        }
+        
         async function resolveMediaUrl(originalUrl) {
             if (!originalUrl) return '';
             if (originalUrl.includes('tiktok.com')) {
@@ -718,66 +766,45 @@
             return originalUrl;
         }
 
-        // ==========================================
-        // 2. AUDIO & ADHAN & INTRO
-        // ==========================================
-        const mainAudioEl = document.getElementById('main-audio');
-        const fallbackAudioEl = document.getElementById('fallback-audio');
-        const adhanAudioEl = document.getElementById('adhan-audio');
-        const introAudioEl = document.getElementById('intro-audio');
-        let activeAudio = mainAudioEl;
-
-        function bindAudioEvents(audio) {
-            audio.addEventListener('play', (e) => { if(e.target===activeAudio) updatePlayState(); });
-            audio.addEventListener('pause', (e) => { if(e.target===activeAudio) updatePlayState(); });
-            audio.addEventListener('timeupdate', (e) => { 
-                if(e.target===activeAudio && activeAudio.duration) { 
-                    document.getElementById('seek-bar').value = (activeAudio.currentTime / activeAudio.duration) * 100; 
-                    document.getElementById('current-time').textContent = fmt(activeAudio.currentTime); 
-                } 
-            });
-            audio.addEventListener('loadedmetadata', (e) => { if(e.target===activeAudio) document.getElementById('duration').textContent = fmt(activeAudio.duration); });
-            audio.addEventListener('ended', (e) => { if(e.target===activeAudio) handleTrackEnded(); });
-        }
-        bindAudioEvents(mainAudioEl); bindAudioEvents(fallbackAudioEl);
-
-        let prayerTimings = null; let lastPlayedAdhan = null; let resumeMainAudioAfterAdhan = false;
-        async function fetchPrayerTimes() {
-            if(!appData.settings.enableAdhan) return;
-            try {
-                const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=Cairo&country=Egypt&method=5`);
-                prayerTimings = (await res.json()).data.timings;
-            } catch(e) { }
-        }
-        function checkPrayerTimes() {
-            if(!appData.settings.enableAdhan || !prayerTimings) return;
-            const now = new Date(); const currentHHMM = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-            const prayers = { 'Fajr':'الفجر', 'Dhuhr':'الظهر', 'Asr':'العصر', 'Maghrib':'المغرب', 'Isha':'العشاء' };
-            for(let p in prayers) {
-                if(prayerTimings[p] === currentHHMM && lastPlayedAdhan !== currentHHMM) {
-                    lastPlayedAdhan = currentHHMM; triggerAdhan(prayers[p]); break;
-                }
-            }
-        }
         async function triggerAdhan(prayerName, forceUrl = null) {
             introAudioEl.pause(); 
             resumeMainAudioAfterAdhan = !activeAudio.paused && currentTrackId !== null;
             if(resumeMainAudioAfterAdhan) activeAudio.pause();
+            
             document.getElementById('adhan-prayer-name').textContent = prayerName;
             document.getElementById('adhan-overlay').classList.remove('hidden');
             document.getElementById('adhan-play-btn').classList.add('hidden');
+            
             let adhanUrl = forceUrl || (prayerName === 'الفجر' ? appData.settings.adhanUrlFajr : appData.settings.adhanUrlGeneral) || 'https://ia801402.us.archive.org/16/items/Adhan_Makkah/Adhan_Makkah.mp3';
             try {
                 adhanAudioEl.src = await resolveMediaUrl(adhanUrl);
                 await adhanAudioEl.play();
-            } catch (e) { document.getElementById('adhan-play-btn').classList.remove('hidden'); }
+            } catch (e) { 
+                document.getElementById('adhan-play-btn').classList.remove('hidden'); 
+            }
         }
-        window.testAdhan = function(type) { triggerAdhan(type + ' (تجريبي)', type === 'الفجر' ? document.getElementById('setting-adhan-fajr').value : document.getElementById('setting-adhan-general').value); };
-        window.forcePlayAdhan = function() { adhanAudioEl.play(); document.getElementById('adhan-play-btn').classList.add('hidden'); };
-        window.skipAdhan = function() { adhanAudioEl.pause(); adhanAudioEl.currentTime = 0; closeAdhanOverlay(); };
-        function closeAdhanOverlay() { document.getElementById('adhan-overlay').classList.add('hidden'); if(resumeMainAudioAfterAdhan) { activeAudio.play(); resumeMainAudioAfterAdhan=false; } }
+
+        window.testAdhan = function(type) { 
+            triggerAdhan(type + ' (تجريبي)', type === 'الفجر' ? document.getElementById('setting-adhan-fajr').value : document.getElementById('setting-adhan-general').value); 
+        };
+        window.forcePlayAdhan = function() { 
+            adhanAudioEl.play(); 
+            document.getElementById('adhan-play-btn').classList.add('hidden'); 
+        };
+        window.skipAdhan = function() { 
+            adhanAudioEl.pause(); 
+            adhanAudioEl.currentTime = 0; 
+            closeAdhanOverlay(); 
+        };
+        function closeAdhanOverlay() { 
+            document.getElementById('adhan-overlay').classList.add('hidden'); 
+            if(resumeMainAudioAfterAdhan) { activeAudio.play(); resumeMainAudioAfterAdhan=false; } 
+        }
+        
         adhanAudioEl.addEventListener('ended', closeAdhanOverlay);
-        fetchPrayerTimes(); setInterval(checkPrayerTimes, 30000); setInterval(fetchPrayerTimes, 86400000);
+        fetchPrayerTimes(); 
+        setInterval(checkPrayerTimes, 30000); 
+        setInterval(fetchPrayerTimes, 86400000);
 
         // ==========================================
         // INTRO TRACK LOGIC
@@ -807,16 +834,22 @@
         };
 
         // ==========================================
-        // 3. UI, PLAYLIST & FAST RENDER (PAGINATED)
+        // 3. UI, PLAYLIST & FAST RENDER
         // ==========================================
         async function updateVisitorCount() {
             try {
+                // تجاوز الحظر باستخدام try/catch صامت لأنه قد يتم حظره بسبب Local File (file:///)
                 let isVisited = sessionStorage.getItem('has_visited');
                 let url = `https://api.counterapi.dev/v1/quran-player-rare-2026/visits`;
                 if(!isVisited) { url += '/up'; sessionStorage.setItem('has_visited', 'true'); }
-                globalVisitorCount = (await (await fetch(url)).json()).count || '---';
+                const response = await fetch(url);
+                const data = await response.json();
+                globalVisitorCount = data.count || '---';
                 updateStats();
-            } catch (err) { }
+            } catch (err) {
+                // سيتم تجاهل الخطأ بصمت لتجنب تعطل التطبيق
+                console.log("تنويه: تعمل من ملف محلي، لذا تم حظر العداد.");
+            }
         }
 
         function updateStats() {
@@ -836,7 +869,6 @@
         }
 
         let prevActiveIds = [];
-        // O(1) تحديث الواجهة السريع جداً لتخفيف الضغط على الرامات
         function updatePlaylistUI() {
             prevActiveIds.forEach(id => {
                 const el = document.getElementById(id);
@@ -868,40 +900,79 @@
 
         window.toggleFavorite = function(e, id) {
             e.stopPropagation(); 
-            const idx = userFavorites.indexOf(id); idx > -1 ? userFavorites.splice(idx, 1) : userFavorites.push(id);
-            localStorage.setItem('quran_user_favorites_v1', JSON.stringify(userFavorites)); renderPlaylist(document.getElementById('search-input').value, false);
-        }
-        window.moveFavorite = function(e, id, dir) {
-            e.stopPropagation(); const idx = userFavorites.indexOf(id);
+            const idx = userFavorites.indexOf(id); 
             if(idx > -1) {
-                if(dir === 'up' && idx > 0) [userFavorites[idx-1], userFavorites[idx]] = [userFavorites[idx], userFavorites[idx-1]];
-                else if(dir === 'down' && idx < userFavorites.length-1) [userFavorites[idx+1], userFavorites[idx]] = [userFavorites[idx], userFavorites[idx+1]];
-                localStorage.setItem('quran_user_favorites_v1', JSON.stringify(userFavorites)); renderPlaylist(document.getElementById('search-input').value, false);
+                userFavorites.splice(idx, 1); 
+            } else {
+                userFavorites.push(id);
+            }
+            localStorage.setItem('quran_user_favorites_v1', JSON.stringify(userFavorites)); 
+            renderPlaylist(document.getElementById('search-input').value, false);
+        }
+        
+        window.moveFavorite = function(e, id, dir) {
+            e.stopPropagation(); 
+            const idx = userFavorites.indexOf(id);
+            if(idx > -1) {
+                if(dir === 'up' && idx > 0) {
+                    [userFavorites[idx-1], userFavorites[idx]] = [userFavorites[idx], userFavorites[idx-1]];
+                } else if(dir === 'down' && idx < userFavorites.length-1) {
+                    [userFavorites[idx+1], userFavorites[idx]] = [userFavorites[idx], userFavorites[idx+1]];
+                }
+                localStorage.setItem('quran_user_favorites_v1', JSON.stringify(userFavorites)); 
+                renderPlaylist(document.getElementById('search-input').value, false);
             }
         }
 
-        // دالة العرض المتطورة للتحميل التدريجي (تمنع التشنج)
         function renderPlaylist(searchTerm = '', resetLimits = true) {
             if (resetLimits) window.catLimits = {};
             
-            const container = document.getElementById('playlist-container'); const emptyState = document.getElementById('empty-state');
+            const container = document.getElementById('playlist-container'); 
+            const emptyState = document.getElementById('empty-state');
             const openAccordions = Array.from(document.querySelectorAll('.accordion-content.open')).map(el => el.id);
             
-            if(appData.tracks.length === 0 && appData.categories.length === 0) { container.innerHTML = ''; emptyState.classList.remove('hidden'); return; }
-            emptyState.classList.add('hidden'); let html = '';
+            if(appData.tracks.length === 0 && appData.categories.length === 0) { 
+                container.innerHTML = ''; 
+                emptyState.classList.remove('hidden'); 
+                return; 
+            }
+            emptyState.classList.add('hidden'); 
+            let html = '';
 
             const sLow = searchTerm.toLowerCase();
 
-            // === المفضلة ===
+            // المفضلة
             const favTracksAll = userFavorites.map(fid => appData.tracks.find(t=>t.id===fid)).filter(t=>t && t.title.toLowerCase().includes(sLow));
             if(searchTerm === '' || favTracksAll.length > 0) {
                 const limit = window.catLimits['fav'] || ITEMS_PER_PAGE;
                 const favTracks = favTracksAll.slice(0, limit);
 
-                html += `<div class="bg-dark-800 rounded-xl border border-rose-500/30 overflow-hidden mb-5 shadow-lg"><button onclick="toggleAccordion('acc_fav')" class="w-full px-4 py-4 flex justify-between bg-dark-700 hover:bg-dark-600 border-r-4 border-rose-500"><div class="flex gap-3"><i class="fas fa-heart text-rose-600"></i><span class="font-bold text-white">المفضلة</span><span class="bg-dark-900 text-rose-500 text-xs px-2 py-1 rounded-full">${favTracksAll.length}</span></div><i class="fas fa-chevron-down text-gray-400" id="icon_acc_fav"></i></button><div id="acc_fav" class="accordion-content"><ul class="divide-y divide-dark-600 max-h-[400px] overflow-y-auto p-2">`;
+                html += `<div class="bg-dark-800 rounded-xl border border-rose-500/30 overflow-hidden mb-5 shadow-lg">
+                            <button onclick="toggleAccordion('acc_fav')" class="w-full px-4 py-4 flex justify-between bg-dark-700 hover:bg-dark-600 border-r-4 border-rose-500">
+                                <div class="flex gap-3"><i class="fas fa-heart text-rose-600"></i><span class="font-bold text-white">المفضلة</span><span class="bg-dark-900 text-rose-500 text-xs px-2 py-1 rounded-full">${favTracksAll.length}</span></div>
+                                <i class="fas fa-chevron-down text-gray-400" id="icon_acc_fav"></i>
+                            </button>
+                            <div id="acc_fav" class="accordion-content">
+                                <ul class="divide-y divide-dark-600 max-h-[400px] overflow-y-auto p-2">`;
+                
                 if(favTracksAll.length === 0) html += `<li class="p-4 text-center text-gray-500">لا توجد مفضلة</li>`;
                 
-                favTracks.forEach((t, i) => html += `<li id="li_${t.id}_favorites" class="p-2 flex items-center justify-between cursor-pointer transition rounded hover:bg-dark-700" onclick="playTrack('${t.id}', 'favorites')"><div class="flex gap-3 flex-1 overflow-hidden"><div class="w-10 h-10 rounded-full bg-dark-900 border border-dark-500 flex items-center justify-center shrink-0"><i class="fas fa-play text-gray-400"></i></div><h4 class="font-bold text-gray-300 truncate">${t.title}</h4></div><div class="flex gap-2 shrink-0"><div class="flex flex-col gap-1 border-l border-dark-600 pl-2"><button onclick="moveFavorite(event,'${t.id}','up')" class="text-gray-500 hover:text-white text-xs"><i class="fas fa-chevron-up"></i></button><button onclick="moveFavorite(event,'${t.id}','down')" class="text-gray-500 hover:text-white text-xs"><i class="fas fa-chevron-down"></i></button></div><button onclick="toggleFavorite(event,'${t.id}')" class="text-rose-600 p-2"><i class="fas fa-heart"></i></button></div></li>`);
+                favTracks.forEach((t, i) => {
+                    html += `
+                    <li id="li_${t.id}_favorites" class="p-2 flex items-center justify-between cursor-pointer transition rounded hover:bg-dark-700" onclick="playTrack('${t.id}', 'favorites')">
+                        <div class="flex gap-3 flex-1 overflow-hidden">
+                            <div class="w-10 h-10 rounded-full bg-dark-900 border border-dark-500 flex items-center justify-center shrink-0"><i class="fas fa-play text-gray-400"></i></div>
+                            <h4 class="font-bold text-gray-300 truncate">${t.title}</h4>
+                        </div>
+                        <div class="flex gap-2 shrink-0">
+                            <div class="flex flex-col gap-1 border-l border-dark-600 pl-2">
+                                <button onclick="moveFavorite(event,'${t.id}','up')" class="text-gray-500 hover:text-white text-xs"><i class="fas fa-chevron-up"></i></button>
+                                <button onclick="moveFavorite(event,'${t.id}','down')" class="text-gray-500 hover:text-white text-xs"><i class="fas fa-chevron-down"></i></button>
+                            </div>
+                            <button onclick="toggleFavorite(event,'${t.id}')" class="text-rose-600 p-2"><i class="fas fa-heart"></i></button>
+                        </div>
+                    </li>`;
+                });
                 
                 if (favTracksAll.length > limit) {
                     html += `<button onclick="window.loadMore('fav')" class="w-full text-center p-3 text-rose-400 hover:text-white hover:bg-dark-700 text-sm font-bold mt-2 rounded transition border border-rose-500/20">عرض المزيد من المفضلة...</button>`;
@@ -909,7 +980,7 @@
                 html += `</ul></div></div>`;
             }
 
-            // === الأقسام والمقاطع ===
+            // الأقسام
             appData.categories.forEach(cat => {
                 const catTracksAll = appData.tracks.filter(t => t.catId === cat.id && t.title.toLowerCase().includes(sLow));
                 if(searchTerm !== '' && catTracksAll.length === 0) return;
@@ -917,10 +988,30 @@
                 const limit = window.catLimits[cat.id] || ITEMS_PER_PAGE;
                 const catTracks = catTracksAll.slice(0, limit);
 
-                html += `<div class="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden mb-3"><button onclick="toggleAccordion('acc_${cat.id}')" class="w-full px-4 py-4 flex justify-between bg-dark-700 hover:bg-dark-600" style="border-right:4px solid ${cat.color}"><div class="flex gap-3"><i class="fas fa-folder" style="color:${cat.color}"></i><span class="font-bold text-white">${cat.name}</span><span class="bg-dark-900 text-gray-400 text-xs px-2 py-1 rounded-full">${catTracksAll.length}</span></div><i class="fas fa-chevron-down text-gray-400" id="icon_acc_${cat.id}"></i></button><div id="acc_${cat.id}" class="accordion-content"><ul class="divide-y divide-dark-600 max-h-[400px] overflow-y-auto p-2">`;
+                html += `<div class="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden mb-3">
+                            <button onclick="toggleAccordion('acc_${cat.id}')" class="w-full px-4 py-4 flex justify-between bg-dark-700 hover:bg-dark-600" style="border-right:4px solid ${cat.color}">
+                                <div class="flex gap-3"><i class="fas fa-folder" style="color:${cat.color}"></i><span class="font-bold text-white">${cat.name}</span><span class="bg-dark-900 text-gray-400 text-xs px-2 py-1 rounded-full">${catTracksAll.length}</span></div>
+                                <i class="fas fa-chevron-down text-gray-400" id="icon_acc_${cat.id}"></i>
+                            </button>
+                            <div id="acc_${cat.id}" class="accordion-content">
+                                <ul class="divide-y divide-dark-600 max-h-[400px] overflow-y-auto p-2">`;
+                
                 if(catTracksAll.length===0) html += `<li class="p-3 text-center text-gray-500">فارغ</li>`;
                 
-                catTracks.forEach(t => html += `<li id="li_${t.id}_category" class="p-2 flex items-center justify-between cursor-pointer transition rounded hover:bg-dark-700" onclick="playTrack('${t.id}', 'category')"><div class="flex gap-3 flex-1 overflow-hidden"><div class="w-10 h-10 rounded-full bg-dark-900 border border-dark-500 flex items-center justify-center shrink-0"><i class="fas fa-play text-gray-400"></i></div><h4 class="font-bold text-gray-300 truncate">${t.title}</h4></div><div class="flex gap-3 shrink-0"><span class="text-xs text-gray-500 hidden md:inline"><i class="fas fa-headphones"></i> ${t.playCount||0}</span><button onclick="toggleFavorite(event,'${t.id}')" class="text-gray-400 hover:text-rose-500 p-2"><i class="${userFavorites.includes(t.id)?'fas text-rose-600':'far'} fa-heart text-lg"></i></button></div></li>`);
+                catTracks.forEach(t => {
+                    const isFav = userFavorites.includes(t.id);
+                    html += `
+                    <li id="li_${t.id}_category" class="p-2 flex items-center justify-between cursor-pointer transition rounded hover:bg-dark-700" onclick="playTrack('${t.id}', 'category')">
+                        <div class="flex gap-3 flex-1 overflow-hidden">
+                            <div class="w-10 h-10 rounded-full bg-dark-900 border border-dark-500 flex items-center justify-center shrink-0"><i class="fas fa-play text-gray-400"></i></div>
+                            <h4 class="font-bold text-gray-300 truncate">${t.title}</h4>
+                        </div>
+                        <div class="flex gap-3 shrink-0">
+                            <span class="text-xs text-gray-500 hidden md:inline"><i class="fas fa-headphones"></i> ${t.playCount||0}</span>
+                            <button onclick="toggleFavorite(event,'${t.id}')" class="text-gray-400 hover:text-rose-500 p-2"><i class="${isFav?'fas text-rose-600':'far'} fa-heart text-lg"></i></button>
+                        </div>
+                    </li>`;
+                });
                 
                 if (catTracksAll.length > limit) {
                     html += `<button onclick="window.loadMore('${cat.id}')" class="w-full text-center p-3 text-gold-400 hover:text-white hover:bg-dark-700 text-sm font-bold mt-2 rounded transition border border-gold-500/20" style="color:${cat.color}">عرض المزيد...</button>`;
@@ -929,9 +1020,20 @@
             });
             container.innerHTML = html;
             
-            // استعادة الأقسام المفتوحة لتجنب غلقها
-            if(searchTerm === '') { openAccordions.forEach(id => { const e=document.getElementById(id), i=document.getElementById('icon_'+id); if(e){ e.classList.add('open'); e.style.maxHeight='2000px'; if(i) i.style.transform='rotate(180deg)'; } }); } 
-            else { document.querySelectorAll('.accordion-content').forEach(e=>e.style.maxHeight='2000px'); document.querySelectorAll('.fa-chevron-down').forEach(e=>e.style.transform='rotate(180deg)'); }
+            if(searchTerm === '') { 
+                openAccordions.forEach(id => { 
+                    const e = document.getElementById(id);
+                    const i = document.getElementById('icon_'+id); 
+                    if(e){ 
+                        e.classList.add('open'); 
+                        e.style.maxHeight='2000px'; 
+                        if(i) i.style.transform='rotate(180deg)'; 
+                    } 
+                }); 
+            } else { 
+                document.querySelectorAll('.accordion-content').forEach(e => e.style.maxHeight='2000px'); 
+                document.querySelectorAll('.fa-chevron-down').forEach(e => e.style.transform='rotate(180deg)'); 
+            }
             updatePlaylistUI();
         }
 
@@ -941,12 +1043,19 @@
         };
 
         window.toggleAccordion = function(id) {
-            const el = document.getElementById(id), icon = document.getElementById('icon_' + id);
-            if(el.classList.contains('open')) { el.classList.remove('open'); el.style.maxHeight=null; icon.style.transform='rotate(0deg)'; } 
-            else { el.classList.add('open'); el.style.maxHeight=el.scrollHeight+"px"; icon.style.transform='rotate(180deg)'; }
+            const el = document.getElementById(id);
+            const icon = document.getElementById('icon_' + id);
+            if(el.classList.contains('open')) { 
+                el.classList.remove('open'); 
+                el.style.maxHeight=null; 
+                icon.style.transform='rotate(0deg)'; 
+            } else { 
+                el.classList.add('open'); 
+                el.style.maxHeight = el.scrollHeight+"px"; 
+                icon.style.transform='rotate(180deg)'; 
+            }
         }
 
-        // Search Debounce (لمنع تشنج الموبايل عند البحث السريع)
         let searchTimeout;
         document.getElementById('search-input').addEventListener('input', (e) => {
             clearTimeout(searchTimeout);
@@ -954,9 +1063,10 @@
         });
 
         // ==========================================
-        // 4. STUDIO FX (تطبيق مستمر للفلاتر والاستريو)
+        // 4. STUDIO FX
         // ==========================================
-        const canvas = document.getElementById('visualizer'), canvasCtx = canvas.getContext('2d');
+        const canvas = document.getElementById('visualizer');
+        const canvasCtx = canvas.getContext('2d');
         let audioCtx, sourceNode, analyserNode, eqFilter, waveShaper, delayNode, feedbackGain, delayOutGain, convolverNode, reverbGain, dryGain, pannerNode, isAudioCtxInitialized = false;
         let dynamicPanInterval; 
 
@@ -984,7 +1094,10 @@
                 reverbGain = audioCtx.createGain(); delayNode = audioCtx.createDelay(); delayNode.delayTime.value=0.4; feedbackGain = audioCtx.createGain(); feedbackGain.gain.value=0.3; delayOutGain = audioCtx.createGain(); dryGain = audioCtx.createGain(); pannerNode = audioCtx.createStereoPanner(); analyserNode = audioCtx.createAnalyser(); analyserNode.fftSize=256;
                 sourceNode.connect(eqFilter); eqFilter.connect(waveShaper); waveShaper.connect(dryGain); waveShaper.connect(convolverNode); waveShaper.connect(delayNode); convolverNode.connect(reverbGain); reverbGain.connect(pannerNode); delayNode.connect(feedbackGain); feedbackGain.connect(delayNode); delayNode.connect(delayOutGain); delayOutGain.connect(pannerNode); dryGain.connect(pannerNode); pannerNode.connect(analyserNode); analyserNode.connect(audioCtx.destination);
                 
-                isAudioCtxInitialized = true; drawVisualizer(); window.applyAudioFX(); window.applyStereoFX();
+                isAudioCtxInitialized = true; 
+                drawVisualizer(); 
+                window.applyAudioFX(); 
+                window.applyStereoFX();
             } catch(e) {}
         }
 
@@ -1009,14 +1122,20 @@
             } else { pannerNode.pan.value = parseFloat(val); }
         };
 
-        document.getElementById('audio-fx-select').addEventListener('change', (e) => { initAudioContext(); window.applyAudioFX(); appData.settings.audioFx = e.target.value; saveData(); });
-        document.getElementById('stereo-select').addEventListener('change', (e) => { initAudioContext(); window.applyStereoFX(); appData.settings.stereo = e.target.value; saveData(); });
+        document.getElementById('audio-fx-select').addEventListener('change', (e) => { 
+            initAudioContext(); window.applyAudioFX(); appData.settings.audioFx = e.target.value; saveData(); 
+        });
+        document.getElementById('stereo-select').addEventListener('change', (e) => { 
+            initAudioContext(); window.applyStereoFX(); appData.settings.stereo = e.target.value; saveData(); 
+        });
 
         function drawVisualizer() {
-            if(!isAudioCtxInitialized) return; requestAnimationFrame(drawVisualizer);
+            if(!isAudioCtxInitialized) return; 
+            requestAnimationFrame(drawVisualizer);
             const data = new Uint8Array(analyserNode.frequencyBinCount);
             if(appData.settings.showVisualizer && !activeAudio.paused && activeAudio===mainAudioEl) analyserNode.getByteFrequencyData(data); else data.fill(0);
-            canvasCtx.clearRect(0,0,canvas.width,canvas.height); if(!appData.settings.showVisualizer) return;
+            canvasCtx.clearRect(0,0,canvas.width,canvas.height); 
+            if(!appData.settings.showVisualizer) return;
             const cy=canvas.height/2, cx=canvas.width/2, bins=Math.floor(data.length*0.5), bw=cx/bins;
             for(let i=0; i<bins; i++) {
                 let bh = Math.max(2, (data[i]/255)*(canvas.height*0.8));
@@ -1033,11 +1152,15 @@
             if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); 
 
             const track = appData.tracks.find(t=>t.id===id); if(!track) return;
-            if(currentTrackId===id && currentPlaylistContext===context) { isPlaying ? activeAudio.pause() : (initAudioContext(), activeAudio.play()); return; }
+            if(currentTrackId===id && currentPlaylistContext===context) { 
+                isPlaying ? activeAudio.pause() : (initAudioContext(), activeAudio.play()); 
+                return; 
+            }
             if(!document.getElementById('adhan-overlay').classList.contains('hidden')) skipAdhan();
             
             currentTrackId = id; currentPlaylistContext = context;
-            document.getElementById('now-playing-title').textContent = "جاري جلب المقطع..."; updatePlaylistUI();
+            document.getElementById('now-playing-title').textContent = "جاري جلب المقطع..."; 
+            updatePlaylistUI();
             
             try {
                 activeAudio.pause(); activeAudio.currentTime = 0;
@@ -1066,42 +1189,108 @@
             updatePlaylistUI();
         }
 
-        document.getElementById('btn-play-pause').addEventListener('click', () => { introAudioEl.pause(); currentTrackId ? (initAudioContext(), activeAudio.paused?activeAudio.play():activeAudio.pause()) : (appData.tracks.length&&playTrack(appData.tracks[0].id)); });
-        function updatePlayState() { isPlaying = !activeAudio.paused; document.getElementById('play-icon').className = isPlaying?'fas fa-pause text-3xl ml-1':'fas fa-play text-3xl ml-1'; isPlaying?recordLogo.classList.remove('pause-animation'):recordLogo.classList.add('pause-animation'); updatePlaylistUI(); }
+        document.getElementById('btn-play-pause').addEventListener('click', () => { 
+            introAudioEl.pause(); 
+            currentTrackId ? (initAudioContext(), activeAudio.paused ? activeAudio.play() : activeAudio.pause()) : (appData.tracks.length && playTrack(appData.tracks[0].id)); 
+        });
+
+        function updatePlayState() { 
+            isPlaying = !activeAudio.paused; 
+            if (playIcon) playIcon.className = isPlaying ? 'fas fa-pause text-3xl ml-1' : 'fas fa-play text-3xl ml-1'; 
+            if (recordLogo) {
+                isPlaying ? recordLogo.classList.remove('pause-animation') : recordLogo.classList.add('pause-animation'); 
+            }
+            updatePlaylistUI(); 
+        }
+
         function handleTrackEnded() {
-            updatePlayState(); activeAudio.currentTime=0;
+            updatePlayState(); 
+            activeAudio.currentTime=0;
             if(currentTrackId) {
                 const trk = appData.tracks.find(t=>t.id===currentTrackId);
                 const list = currentPlaylistContext==='favorites' ? userFavorites.map(fid=>appData.tracks.find(t=>t.id===fid)).filter(Boolean) : appData.tracks.filter(t=>t.catId===trk.catId);
-                if(list.length>0) { const i=list.findIndex(t=>t.id===currentTrackId); if(i>-1) playTrack(list[i+1<list.length?i+1:0].id, currentPlaylistContext); }
+                if(list.length>0) { 
+                    const i = list.findIndex(t=>t.id===currentTrackId); 
+                    if(i > -1) playTrack(list[i+1<list.length?i+1:0].id, currentPlaylistContext); 
+                }
             }
         }
+
         function fmt(s){ return `${Math.floor(s/60).toString().padStart(2,'0')}:${Math.floor(s%60).toString().padStart(2,'0')}`; }
-        document.getElementById('seek-bar').addEventListener('input', (e) => activeAudio.currentTime = activeAudio.duration * (e.target.value/100));
-        document.getElementById('volume-slider').addEventListener('input', (e) => { mainAudioEl.volume=e.target.value; fallbackAudioEl.volume=e.target.value; introAudioEl.volume=e.target.value; });
-        document.getElementById('btn-forward').addEventListener('click', () => { if(activeAudio.duration) activeAudio.currentTime = Math.min(activeAudio.currentTime+10, activeAudio.duration); });
-        document.getElementById('btn-backward').addEventListener('click', () => { if(activeAudio.duration) activeAudio.currentTime = Math.max(activeAudio.currentTime-10, 0); });
+        
+        if (seekBar) {
+            seekBar.addEventListener('input', (e) => activeAudio.currentTime = activeAudio.duration * (e.target.value/100));
+        }
+        document.getElementById('volume-slider').addEventListener('input', (e) => { 
+            mainAudioEl.volume=e.target.value; 
+            fallbackAudioEl.volume=e.target.value; 
+            introAudioEl.volume=e.target.value; 
+        });
+        document.getElementById('btn-forward').addEventListener('click', () => { 
+            if(activeAudio.duration) activeAudio.currentTime = Math.min(activeAudio.currentTime+10, activeAudio.duration); 
+        });
+        document.getElementById('btn-backward').addEventListener('click', () => { 
+            if(activeAudio.duration) activeAudio.currentTime = Math.max(activeAudio.currentTime-10, 0); 
+        });
 
         // ==========================================
         // 6. ADMIN DASHBOARD
         // ==========================================
-        window.openDashboardLogin = function() { document.getElementById('login-modal').classList.remove('hidden'); document.getElementById('admin-password').value=''; document.getElementById('admin-password').focus(); };
-        window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); };
-        window.checkPassword = function() { if(document.getElementById('admin-password').value==='2112') { closeModal('login-modal'); document.getElementById('dashboard-modal').classList.remove('hidden'); initDashboard(); } else alert("خطأ!"); };
-        window.switchTab = function(id) { document.querySelectorAll('.tab-content').forEach(e=>e.classList.add('hidden')); document.querySelectorAll('.dash-tab').forEach(e=>e.className='dash-tab p-4 text-right border-b border-dark-700 text-gray-400 hover:text-gold-500 hover:bg-dark-800 transition'); document.getElementById(id).classList.remove('hidden'); event.currentTarget.className='dash-tab active p-4 text-right border-b border-dark-700 text-gold-500 font-bold hover:bg-dark-800 transition'; };
+        window.openDashboardLogin = function() { 
+            document.getElementById('login-modal').classList.remove('hidden'); 
+            document.getElementById('admin-password').value=''; 
+            document.getElementById('admin-password').focus(); 
+        };
+        window.closeModal = function(id) { 
+            document.getElementById(id).classList.add('hidden'); 
+        };
+        window.checkPassword = function() { 
+            if(document.getElementById('admin-password').value==='2112') { 
+                closeModal('login-modal'); 
+                document.getElementById('dashboard-modal').classList.remove('hidden'); 
+                initDashboard(); 
+            } else alert("خطأ!"); 
+        };
+        window.switchTab = function(id) { 
+            document.querySelectorAll('.tab-content').forEach(e=>e.classList.add('hidden')); 
+            document.querySelectorAll('.dash-tab').forEach(e=>e.className='dash-tab p-4 text-right border-b border-dark-700 text-gray-400 hover:text-gold-500 hover:bg-dark-800 transition'); 
+            document.getElementById(id).classList.remove('hidden'); 
+            event.currentTarget.className='dash-tab active p-4 text-right border-b border-dark-700 text-gold-500 font-bold hover:bg-dark-800 transition'; 
+        };
         
         function initDashboard() {
-            document.getElementById('setting-logo').value = appData.settings.logoUrl; document.getElementById('setting-intro-url').value = appData.settings.introUrl || ''; document.getElementById('setting-floating').checked = appData.settings.showFloating; document.getElementById('setting-visualizer').checked = appData.settings.showVisualizer; document.getElementById('setting-adhan-enable').checked = appData.settings.enableAdhan!==false; document.getElementById('setting-adhan-fajr').value = appData.settings.adhanUrlFajr||''; document.getElementById('setting-adhan-general').value = appData.settings.adhanUrlGeneral||''; document.getElementById('setting-ticker-speed').value = appData.settings.tickerSpeed||30;
-            renderAdminCats(); renderAdminTracks();
+            document.getElementById('setting-logo').value = appData.settings.logoUrl; 
+            document.getElementById('setting-intro-url').value = appData.settings.introUrl || ''; 
+            document.getElementById('setting-floating').checked = appData.settings.showFloating; 
+            document.getElementById('setting-visualizer').checked = appData.settings.showVisualizer; 
+            document.getElementById('setting-adhan-enable').checked = appData.settings.enableAdhan!==false; 
+            document.getElementById('setting-adhan-fajr').value = appData.settings.adhanUrlFajr||''; 
+            document.getElementById('setting-adhan-general').value = appData.settings.adhanUrlGeneral||''; 
+            document.getElementById('setting-ticker-speed').value = appData.settings.tickerSpeed||30;
+            renderAdminCats(); 
+            renderAdminTracks();
         }
+        
         window.saveSettings = function() {
-            appData.settings.logoUrl=document.getElementById('setting-logo').value; appData.settings.introUrl=document.getElementById('setting-intro-url').value; appData.settings.showFloating=document.getElementById('setting-floating').checked; appData.settings.showVisualizer=document.getElementById('setting-visualizer').checked; appData.settings.enableAdhan=document.getElementById('setting-adhan-enable').checked; appData.settings.adhanUrlFajr=document.getElementById('setting-adhan-fajr').value; appData.settings.adhanUrlGeneral=document.getElementById('setting-adhan-general').value; appData.settings.tickerSpeed=parseInt(document.getElementById('setting-ticker-speed').value);
-            saveData(); applySettings(); updateStats(); if(appData.settings.enableAdhan) fetchPrayerTimes(); alert('تم الحفظ بنجاح!');
+            appData.settings.logoUrl = document.getElementById('setting-logo').value; 
+            appData.settings.introUrl = document.getElementById('setting-intro-url').value; 
+            appData.settings.showFloating = document.getElementById('setting-floating').checked; 
+            appData.settings.showVisualizer = document.getElementById('setting-visualizer').checked; 
+            appData.settings.enableAdhan = document.getElementById('setting-adhan-enable').checked; 
+            appData.settings.adhanUrlFajr = document.getElementById('setting-adhan-fajr').value; 
+            appData.settings.adhanUrlGeneral = document.getElementById('setting-adhan-general').value; 
+            appData.settings.tickerSpeed = parseInt(document.getElementById('setting-ticker-speed').value);
+            
+            saveData(); 
+            applySettings(); 
+            updateStats(); 
+            if(appData.settings.enableAdhan) fetchPrayerTimes(); 
+            alert('تم الحفظ بنجاح!');
         }
         
         function applySettings() { 
-            document.getElementById('logo-img').src=appData.settings.logoUrl; 
-            appData.settings.showFloating?startFloating():stopFloating(); 
+            document.getElementById('logo-img').src = appData.settings.logoUrl; 
+            appData.settings.showFloating ? startFloating() : stopFloating(); 
             if(!appData.settings.showVisualizer) canvasCtx.clearRect(0,0,canvas.width,canvas.height); 
             
             if(appData.settings.audioFx) document.getElementById('audio-fx-select').value = appData.settings.audioFx;
@@ -1112,30 +1301,320 @@
         
         window.renderAdminCats = function() {
             if(!Array.isArray(appData.categories)) appData.categories = [...DEFAULT_DATA.categories];
-            document.getElementById('admin-cats-list').innerHTML = appData.categories.map((c,i) => `<div class="bg-dark-800 p-3 rounded border border-dark-600 flex justify-between items-center" style="border-right:4px solid ${c.color}"><span class="text-white font-bold">${c.name}</span><div class="gap-2 flex items-center"><button onclick="moveCategory(${i},-1)" class="text-gray-400 hover:text-white px-1"><i class="fas fa-arrow-up"></i></button><button onclick="moveCategory(${i},1)" class="text-gray-400 hover:text-white px-1 border-l border-dark-600 pl-2"><i class="fas fa-arrow-down"></i></button><button onclick="editCat('${c.id}')" class="text-blue-400 hover:text-blue-300 px-2"><i class="fas fa-edit"></i></button><button onclick="deleteCat('${c.id}')" class="text-red-400 hover:text-red-300 px-2"><i class="fas fa-trash"></i></button></div></div>`).join('');
-            const opts = appData.categories.map(c=>`<option value="${c.id}">${c.name}</option>`).join(''); document.getElementById('trk-cat').innerHTML=opts; document.getElementById('import-cat').innerHTML=opts; document.getElementById('bulk-cat').innerHTML=opts;
+            document.getElementById('admin-cats-list').innerHTML = appData.categories.map((c,i) => 
+                `<div class="bg-dark-800 p-3 rounded border border-dark-600 flex justify-between items-center" style="border-right:4px solid ${c.color}">
+                    <span class="text-white font-bold">${c.name}</span>
+                    <div class="gap-2 flex items-center">
+                        <button onclick="moveCategory(${i},-1)" class="text-gray-400 hover:text-white px-1"><i class="fas fa-arrow-up"></i></button>
+                        <button onclick="moveCategory(${i},1)" class="text-gray-400 hover:text-white px-1 border-l border-dark-600 pl-2"><i class="fas fa-arrow-down"></i></button>
+                        <button onclick="editCat('${c.id}')" class="text-blue-400 hover:text-blue-300 px-2"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteCat('${c.id}')" class="text-red-400 hover:text-red-300 px-2"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`
+            ).join('');
+            
+            const opts = appData.categories.map(c=>`<option value="${c.id}">${c.name}</option>`).join(''); 
+            document.getElementById('trk-cat').innerHTML=opts; 
+            document.getElementById('import-cat').innerHTML=opts; 
+            document.getElementById('bulk-cat').innerHTML=opts;
         }
-        window.moveCategory = function(i, d) { const n=i+d; if(n<0||n>=appData.categories.length)return; [appData.categories[i], appData.categories[n]]=[appData.categories[n], appData.categories[i]]; saveData(); renderAdminCats(); renderPlaylist(document.getElementById('search-input').value, false); }
-        document.getElementById('cat-form').addEventListener('submit', (e) => { e.preventDefault(); const id=document.getElementById('cat-id').value, n=document.getElementById('cat-name').value, c=document.getElementById('cat-color').value; if(id){ const i=appData.categories.findIndex(x=>x.id===id); if(i>-1)appData.categories[i]={id,name:n,color:c}; } else appData.categories.push({id:'cat_'+Date.now(),name:n,color:c}); saveData(); renderAdminCats(); window.resetCatForm(); renderPlaylist(document.getElementById('search-input').value, false); });
-        window.editCat = function(id) { const c=appData.categories.find(x=>x.id===id); if(c){ document.getElementById('cat-id').value=c.id; document.getElementById('cat-name').value=c.name; document.getElementById('cat-color').value=c.color; document.getElementById('cat-submit').textContent='تعديل'; document.getElementById('cat-cancel').classList.remove('hidden'); } }
-        window.deleteCat = function(id) { if(confirm('هل أنت متأكد من حذف هذا القسم؟ (سيتم حذف جميع المقاطع التابعة له نهائياً!)')) { appData.categories=appData.categories.filter(c=>c.id!==id); appData.tracks=appData.tracks.filter(t=>t.catId!==id); saveData(); renderAdminCats(); renderAdminTracks(); renderPlaylist(document.getElementById('search-input').value, false); } }
-        window.resetCatForm = function() { document.getElementById('cat-id').value=''; document.getElementById('cat-name').value=''; document.getElementById('cat-color').value='#d4af37'; document.getElementById('cat-submit').textContent='إضافة'; document.getElementById('cat-cancel').classList.add('hidden'); }
+
+        window.moveCategory = function(i, d) { 
+            const n = i+d; 
+            if(n<0||n>=appData.categories.length) return; 
+            [appData.categories[i], appData.categories[n]] = [appData.categories[n], appData.categories[i]]; 
+            saveData(); 
+            renderAdminCats(); 
+            renderPlaylist(document.getElementById('search-input').value, false); 
+        }
+
+        const catForm = document.getElementById('cat-form');
+        if (catForm) {
+            catForm.addEventListener('submit', (e) => { 
+                e.preventDefault(); 
+                const id = document.getElementById('cat-id').value;
+                const n = document.getElementById('cat-name').value;
+                const c = document.getElementById('cat-color').value; 
+                
+                if(id){ 
+                    const i = appData.categories.findIndex(x=>x.id===id); 
+                    if(i>-1) appData.categories[i] = {id, name:n, color:c}; 
+                } else {
+                    appData.categories.push({id:'cat_'+Date.now(), name:n, color:c}); 
+                }
+                
+                saveData(); 
+                renderAdminCats(); 
+                window.resetCatForm(); 
+                renderPlaylist(document.getElementById('search-input').value, false); 
+            });
+        }
+
+        window.editCat = function(id) { 
+            const c = appData.categories.find(x=>x.id===id); 
+            if(c){ 
+                document.getElementById('cat-id').value=c.id; 
+                document.getElementById('cat-name').value=c.name; 
+                document.getElementById('cat-color').value=c.color; 
+                document.getElementById('cat-submit').textContent='تعديل'; 
+                document.getElementById('cat-cancel').classList.remove('hidden'); 
+            } 
+        }
+
+        window.deleteCat = function(id) { 
+            if(confirm('هل أنت متأكد من حذف هذا القسم؟ (سيتم حذف جميع المقاطع التابعة له نهائياً!)')) { 
+                appData.categories = appData.categories.filter(c=>c.id!==id); 
+                appData.tracks = appData.tracks.filter(t=>t.catId!==id); 
+                saveData(); 
+                renderAdminCats(); 
+                renderAdminTracks(); 
+                renderPlaylist(document.getElementById('search-input').value, false); 
+            } 
+        }
+
+        window.resetCatForm = function() { 
+            document.getElementById('cat-id').value=''; 
+            document.getElementById('cat-name').value=''; 
+            document.getElementById('cat-color').value='#d4af37'; 
+            document.getElementById('cat-submit').textContent='إضافة'; 
+            document.getElementById('cat-cancel').classList.add('hidden'); 
+        }
 
         window.renderAdminTracks = function() {
             if(!Array.isArray(appData.tracks)) appData.tracks = [];
             const q = document.getElementById('admin-search-track').value.toLowerCase();
-            document.getElementById('admin-tracks-list').innerHTML = appData.tracks.filter(t=>t.title.toLowerCase().includes(q)||t.url.includes(q)).slice(0,200).map(t => `<tr class="hover:bg-dark-700 transition"><td class="px-3 py-2 text-center"><input type="checkbox" class="track-checkbox custom-checkbox" value="${t.id}" onchange="updateBulkUI()"></td><td class="px-4 py-2 text-white font-bold cursor-pointer hover:text-gold-400" onclick="editAdminTrack('${t.id}')">${t.title}</td><td class="px-4 py-2 text-gray-400">${appData.categories.find(c=>c.id===t.catId)?.name||'بدون قسم'}</td><td class="px-4 py-2 text-center"><button onclick="deleteAdminTrack('${t.id}')" class="text-red-400 hover:text-red-300 px-2"><i class="fas fa-trash"></i></button></td></tr>`).join('');
-            document.getElementById('check-all').checked = false; window.updateBulkUI();
+            document.getElementById('admin-tracks-list').innerHTML = appData.tracks.filter(t=>t.title.toLowerCase().includes(q)||t.url.includes(q)).slice(0,200).map(t => 
+                `<tr class="hover:bg-dark-700 transition">
+                    <td class="px-3 py-2 text-center"><input type="checkbox" class="track-checkbox custom-checkbox" value="${t.id}" onchange="updateBulkUI()"></td>
+                    <td class="px-4 py-2 text-white font-bold cursor-pointer hover:text-gold-400" onclick="editAdminTrack('${t.id}')">${t.title}</td>
+                    <td class="px-4 py-2 text-gray-400">${appData.categories.find(c=>c.id===t.catId)?.name||'بدون قسم'}</td>
+                    <td class="px-4 py-2 text-center"><button onclick="deleteAdminTrack('${t.id}')" class="text-red-400 hover:text-red-300 px-2"><i class="fas fa-trash"></i></button></td>
+                </tr>`
+            ).join('');
+            document.getElementById('check-all').checked = false; 
+            window.updateBulkUI();
         }
-        window.toggleAllTracks = function(s) { document.querySelectorAll('.track-checkbox').forEach(cb=>cb.checked=s.checked); window.updateBulkUI(); }
-        window.updateBulkUI = function() { const c=document.querySelectorAll('.track-checkbox:checked').length; const tb=document.getElementById('bulk-toolbar'), sc=document.getElementById('selected-count'); if(c>0){tb.classList.remove('hidden'); sc.classList.remove('hidden'); sc.textContent=`محدد: ${c}`;}else{tb.classList.add('hidden'); sc.classList.add('hidden');} }
+
+        window.toggleAllTracks = function(s) { 
+            document.querySelectorAll('.track-checkbox').forEach(cb=>cb.checked=s.checked); 
+            window.updateBulkUI(); 
+        }
+
+        window.updateBulkUI = function() { 
+            const c = document.querySelectorAll('.track-checkbox:checked').length; 
+            const tb = document.getElementById('bulk-toolbar');
+            const sc = document.getElementById('selected-count'); 
+            if(c>0) {
+                tb.classList.remove('hidden'); 
+                sc.classList.remove('hidden'); 
+                sc.textContent=`محدد: ${c}`;
+            } else {
+                tb.classList.add('hidden'); 
+                sc.classList.add('hidden');
+            } 
+        }
+
         const getSelIds = () => Array.from(document.querySelectorAll('.track-checkbox:checked')).map(c=>c.value);
-        window.bulkDelete = function() { const ids=getSelIds(); if(ids.length&&confirm(`حذف ${ids.length}؟`)){ appData.tracks=appData.tracks.filter(t=>!ids.includes(t.id)); saveData(); renderAdminTracks(); renderPlaylist(document.getElementById('search-input').value, false); } }
-        window.bulkChangeCategory = function() { const ids=getSelIds(), c=document.getElementById('bulk-cat').value; if(ids.length&&c){ ids.forEach(id=>{let t=appData.tracks.find(x=>x.id===id);if(t)t.catId=c;}); saveData(); renderAdminTracks(); renderPlaylist(document.getElementById('search-input').value, false); alert('تم النقل!'); } }
-        window.bulkRename = function() { const ids=getSelIds(), b=document.getElementById('bulk-rename-base').value; if(ids.length&&b){ let c=1; ids.forEach(id=>{let t=appData.tracks.find(x=>x.id===id);if(t){t.title=`${b} ${c++}`;}}); saveData(); renderAdminTracks(); renderPlaylist(document.getElementById('search-input').value, false); document.getElementById('bulk-rename-base').value=''; } }
-        window.editAdminTrack = function(id) { const t=appData.tracks.find(x=>x.id===id); if(t){ document.getElementById('trk-id').value=t.id; document.getElementById('trk-name').value=t.title; document.getElementById('trk-url').value=t.url; document.getElementById('trk-cat').value=t.catId; document.getElementById('trk-submit').innerHTML='<i class="fas fa-save"></i>'; document.getElementById('trk-cancel').classList.remove('hidden'); } }
-        window.deleteAdminTrack = function(id) { if(confirm('حذف؟')){ appData.tracks=appData.tracks.filter(t=>t.id!==id); saveData(); renderAdminTracks(); renderPlaylist(document.getElementById('search-input').value, false); } }
-        window.resetTrackForm = function() { document.getElementById('trk-id').value=''; document.getElementById('trk-name').value=''; document.getElementById('trk-url').value=''; document.getElementById('trk-submit').innerHTML='<i class="fas fa-plus"></i>'; document.getElementById('trk-cancel').classList.add('hidden'); }
+
+        window.bulkDelete = function() { 
+            const ids = getSelIds(); 
+            if(ids.length && confirm(`حذف ${ids.length}؟`)){ 
+                appData.tracks = appData.tracks.filter(t=>!ids.includes(t.id)); 
+                saveData(); 
+                renderAdminTracks(); 
+                renderPlaylist(document.getElementById('search-input').value, false); 
+            } 
+        }
+
+        window.bulkChangeCategory = function() { 
+            const ids = getSelIds();
+            const c = document.getElementById('bulk-cat').value; 
+            if(ids.length && c) { 
+                ids.forEach(id => {
+                    let t = appData.tracks.find(x=>x.id===id);
+                    if(t) t.catId = c;
+                }); 
+                saveData(); 
+                renderAdminTracks(); 
+                renderPlaylist(document.getElementById('search-input').value, false); 
+                alert('تم النقل!'); 
+            } 
+        }
+
+        window.bulkRename = function() { 
+            const ids = getSelIds();
+            const b = document.getElementById('bulk-rename-base').value; 
+            if(ids.length && b) { 
+                let c = 1; 
+                ids.forEach(id => {
+                    let t = appData.tracks.find(x=>x.id===id);
+                    if(t) { t.title = `${b} ${c++}`; }
+                }); 
+                saveData(); 
+                renderAdminTracks(); 
+                renderPlaylist(document.getElementById('search-input').value, false); 
+                document.getElementById('bulk-rename-base').value=''; 
+            } 
+        }
+
+        window.editAdminTrack = function(id) { 
+            const t = appData.tracks.find(x=>x.id===id); 
+            if(t) { 
+                document.getElementById('trk-id').value=t.id; 
+                document.getElementById('trk-name').value=t.title; 
+                document.getElementById('trk-url').value=t.url; 
+                document.getElementById('trk-cat').value=t.catId; 
+                document.getElementById('trk-submit').innerHTML='<i class="fas fa-save"></i>'; 
+                document.getElementById('trk-cancel').classList.remove('hidden'); 
+            } 
+        }
+
+        window.deleteAdminTrack = function(id) { 
+            if(confirm('حذف؟')){ 
+                appData.tracks = appData.tracks.filter(t=>t.id!==id); 
+                saveData(); 
+                renderAdminTracks(); 
+                renderPlaylist(document.getElementById('search-input').value, false); 
+            } 
+        }
+
+        window.resetTrackForm = function() { 
+            document.getElementById('trk-id').value=''; 
+            document.getElementById('trk-name').value=''; 
+            document.getElementById('trk-url').value=''; 
+            document.getElementById('trk-submit').innerHTML='<i class="fas fa-plus"></i>'; 
+            document.getElementById('trk-cancel').classList.add('hidden'); 
+        }
+        
+        const trackFormEl = document.getElementById('track-form');
+        if (trackFormEl) {
+            trackFormEl.addEventListener('submit', (e) => { 
+                e.preventDefault(); 
+                const id = document.getElementById('trk-id').value;
+                const title = document.getElementById('trk-name').value;
+                const url = document.getElementById('trk-url').value;
+                const catId = document.getElementById('trk-cat').value; 
+                
+                if(id){ 
+                    const i = appData.tracks.findIndex(t=>t.id===id); 
+                    if(i > -1) {
+                        appData.tracks[i] = {...appData.tracks[i], title, url, catId}; 
+                    }
+                } else { 
+                    appData.tracks.unshift({id:'trk_'+Date.now(), title, url, catId, playCount:0, dateAdded:Date.now()}); 
+                }
+                saveData(); 
+                renderAdminTracks(); 
+                window.resetTrackForm(); 
+                renderPlaylist(document.getElementById('search-input').value, false); 
+            });
+        }
+
+        window.startBulkImport = async function() {
+            const urlInput = document.getElementById('import-url').value.trim();
+            const catId = document.getElementById('import-cat').value;
+            const bName = document.getElementById('import-base-name').value.trim();
+            
+            if(!urlInput || !catId) return alert('أدخل الرابط والقسم'); 
+            
+            const sDiv = document.getElementById('import-status');
+            const msg = document.getElementById('import-msg');
+            const prog = document.getElementById('import-progress');
+            const btn = document.getElementById('btn-import');
+
+            if (urlInput.includes('tiktok.com')) {
+                sDiv.classList.remove('hidden'); 
+                btn.disabled = true; 
+                btn.classList.add('opacity-50'); 
+                prog.style.width = '50%';
+                msg.textContent = 'جاري سحب المقطع من تيك توك...';
+                
+                try {
+                    let cleanUrl = urlInput;
+                    if(cleanUrl.includes('/video/')) cleanUrl = cleanUrl.split('?')[0];
+                    const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(cleanUrl)}`);
+                    const json = await res.json();
+                    
+                    if (json && json.data) {
+                        let t = bName ? bName : (json.data.title ? autoCleanName(json.data.title) : 'مقطع تيك توك');
+                        if(!appData.tracks.find(x => x.url === urlInput)){
+                            appData.tracks.unshift({id:'trk_'+Date.now()+Math.random(), title:t, url:urlInput, catId, playCount:0, dateAdded:Date.now()});
+                        }
+                        prog.style.width = '100%'; 
+                        msg.textContent = `تم استيراد مقطع تيك توك بنجاح!`; 
+                        msg.className = 'text-green-400 font-bold'; 
+                        saveData(); 
+                        renderAdminTracks(); 
+                        renderPlaylist(document.getElementById('search-input').value, false);
+                        
+                        setTimeout(()=>{ 
+                            sDiv.classList.add('hidden'); 
+                            msg.className = 'text-white font-bold'; 
+                            btn.disabled = false; 
+                            btn.classList.remove('opacity-50'); 
+                            document.getElementById('import-url').value = ''; 
+                        }, 3000);
+                    } else throw new Error('تعذر جلب بيانات المقطع');
+                } catch(e) {
+                    msg.textContent = e.message || 'خطأ بالاتصال بتيك توك'; 
+                    msg.className = 'text-red-400 font-bold'; 
+                    btn.disabled = false; 
+                    btn.classList.remove('opacity-50');
+                }
+                return;
+            }
+
+            const m = urlInput.match(/details\/([^\/\?]+)/); 
+            if(!m) return alert('رابط غير صحيح. يجب أن يكون من أرشيف الإنترنت أو تيك توك.');
+            const id = m[1];
+            
+            sDiv.classList.remove('hidden'); 
+            btn.disabled = true; 
+            btn.classList.add('opacity-50'); 
+            prog.style.width = '10%';
+            
+            try {
+                const res = await fetch(`https://archive.org/metadata/${id}`);
+                const d = await res.json(); 
+                if(!d.files) throw new Error('لا توجد ملفات');
+                
+                prog.style.width = '50%'; 
+                msg.textContent = 'جاري المعالجة...'; 
+                
+                const mp3s = d.files.filter(f => f.name.toLowerCase().endsWith('.mp3')).sort((a,b) => a.name.localeCompare(b.name));
+                if(!mp3s.length) throw new Error('لا توجد ملفات MP3'); 
+                
+                let added = 0;
+                mp3s.forEach((f, i) => { 
+                    let t = bName ? `${bName} ${i+1}` : (f.title || f.name).replace(/\.(mp3|wav)/gi,''); 
+                    const u = `https://archive.org/download/${id}/${f.name}`; 
+                    if(!appData.tracks.find(x => x.url === u)){
+                        appData.tracks.push({id:'trk_'+Date.now()+Math.random(), title:t, url:u, catId, playCount:0, dateAdded:Date.now()}); 
+                        added++;
+                    } 
+                });
+                
+                prog.style.width = '100%'; 
+                msg.textContent = `تم استيراد ${added} مقطع!`; 
+                msg.className = 'text-green-400 font-bold'; 
+                saveData(); 
+                renderAdminTracks(); 
+                renderPlaylist(document.getElementById('search-input').value, false);
+                
+                setTimeout(() => { 
+                    sDiv.classList.add('hidden'); 
+                    msg.className = 'text-white font-bold'; 
+                    btn.disabled = false; 
+                    btn.classList.remove('opacity-50'); 
+                    document.getElementById('import-url').value = ''; 
+                }, 3000);
+            } catch(e) { 
+                msg.textContent = e.message || 'خطأ بالاتصال'; 
+                msg.className = 'text-red-400 font-bold'; 
+                btn.disabled = false; 
+                btn.classList.remove('opacity-50'); 
+            }
+        }
 
         // ==========================================
         // 8. BACKGROUND EFFECTS
