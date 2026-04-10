@@ -215,29 +215,39 @@
                             <i class="fas fa-volume-down text-gray-500"></i>
                         </div>
                         
-                        <!-- Stereo Dropdown -->
-                        <div class="bg-dark-800 rounded-lg p-2 border border-dark-600 flex flex-col gap-1 text-right">
-                            <label class="text-[10px] text-gold-500 font-bold ml-2"><i class="fas fa-headphones mr-1"></i> توازن الصوت (استريو)</label>
-                            <select id="stereo-select" class="bg-dark-700 text-gray-200 text-xs rounded p-1 outline-none focus:border-gold-500 w-full text-center">
-                                <option value="0">افتراضي (بالمنتصف)</option>
-                                <option value="1">سماعة يمين</option>
-                                <option value="-1">سماعة يسار</option>
-                                <option value="dynamic">محيطي ديناميكي متحرك</option>
-                            </select>
-                        </div>
+                        <!-- FX & EQ Panel -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <!-- Stereo Preset -->
+                            <div class="bg-dark-800 rounded-lg p-2 border border-dark-600 flex flex-col gap-1 text-right">
+                                <label class="text-[10px] text-gold-500 font-bold ml-2"><i class="fas fa-headphones mr-1"></i> توازن الصوت (استريو)</label>
+                                <select id="stereo-select" class="bg-dark-700 text-gray-200 text-xs rounded p-1 outline-none focus:border-gold-500 w-full text-center">
+                                    <option value="0">افتراضي (بالمنتصف)</option>
+                                    <option value="1">سماعة يمين</option>
+                                    <option value="-1">سماعة يسار</option>
+                                    <option value="dynamic">محيطي ديناميكي متحرك</option>
+                                </select>
+                            </div>
 
-                        <!-- NEW: Advanced Studio FX Panel -->
-                        <div class="bg-dark-800 rounded-lg p-3 border border-dark-600 text-right shadow-inner relative overflow-hidden">
-                            <!-- Header & Presets -->
-                            <div class="flex justify-between items-center mb-4 border-b border-dark-600 pb-2">
-                                <h4 class="text-xs text-gold-500 font-bold"><i class="fas fa-sliders-h ml-1"></i> مكسر الاستوديو</h4>
-                                <select id="fx-presets" class="bg-dark-700 text-gold-400 font-bold border border-dark-500 text-[10px] rounded p-1 outline-none cursor-pointer">
-                                    <option value="custom">تخصيص يدوي</option>
-                                    <option value="clear">صوت نقي وحاد</option>
+                            <!-- Audio Filters -->
+                            <div class="bg-dark-800 rounded-lg p-2 border border-dark-600 flex flex-col gap-1 text-right">
+                                <label class="text-[10px] text-gold-500 font-bold ml-2"><i class="fas fa-magic mr-1"></i> القوالب الجاهزة</label>
+                                <select id="audio-fx-select" class="bg-dark-700 text-gray-200 text-xs rounded p-1 outline-none focus:border-gold-500 w-full text-center">
+                                    <option value="none">صوت أصلي (بدون فلاتر)</option>
+                                    <option value="clear">نقي للغاية (Clear)</option>
                                     <option value="bass">تضخيم عميق (Bass)</option>
                                     <option value="mosque">تأثير المسجد</option>
                                     <option value="echo">صدى واسع</option>
+                                    <option value="old-movie">فيلم أبيض وأسود</option>
+                                    <option value="old-radio">إذاعة قديمة جداً</option>
+                                    <option value="custom">تخصيص يدوي بالمكسر</option>
                                 </select>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Studio FX Panel -->
+                        <div class="bg-dark-800 rounded-lg p-3 border border-dark-600 text-right shadow-inner relative overflow-hidden mt-4">
+                            <div class="flex justify-between items-center mb-4 border-b border-dark-600 pb-2">
+                                <h4 class="text-xs text-gold-500 font-bold"><i class="fas fa-sliders-h ml-1"></i> مكسر الاستوديو (تعديل يدوي)</h4>
                             </div>
                             
                             <!-- EQ Sliders -->
@@ -264,13 +274,13 @@
                                 <div class="flex items-center gap-3 pt-2 border-t border-dark-700">
                                     <span class="w-12 text-left text-[10px] text-gray-400 font-mono">ECHO</span>
                                     <input type="range" id="sl-echo" min="0" max="1" step="0.05" value="0" class="flex-1 fx-slider">
-                                    <span class="w-10 text-right text-[10px] text-gold-500 font-bold" id="val-echo">0</span>
+                                    <span class="w-10 text-right text-[10px] text-gold-500 font-bold" id="val-echo">0%</span>
                                 </div>
                                 <!-- Reverb -->
                                 <div class="flex items-center gap-3">
                                     <span class="w-12 text-left text-[10px] text-gray-400 font-mono">REVERB</span>
                                     <input type="range" id="sl-reverb" min="0" max="2" step="0.1" value="0" class="flex-1 fx-slider">
-                                    <span class="w-10 text-right text-[10px] text-gold-500 font-bold" id="val-reverb">0</span>
+                                    <span class="w-10 text-right text-[10px] text-gold-500 font-bold" id="val-reverb">0%</span>
                                 </div>
                             </div>
                         </div>
@@ -575,7 +585,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- Firebase Integration -->
     <script type="module">
@@ -664,6 +674,7 @@
                 adhanUrlGeneral: 'https://ia801402.us.archive.org/16/items/Adhan_Makkah/Adhan_Makkah.mp3', 
                 adhanUrlFajr: 'https://archive.org/download/Adhan_fajr_1/Adhan_fajr.mp3',
                 studio: { bass: 0, mid: 0, treble: 0, echo: 0, reverb: 0 },
+                audioFx: 'none',
                 stereo: '0'      
             },
             categories: [ { id: 'cat_1', name: 'تلاوات خاشعة', color: '#d4af37' }, { id: 'cat_2', name: 'المصحف المرتل', color: '#34a667' } ],
@@ -910,8 +921,15 @@
         // ==========================================
         const canvas = document.getElementById('visualizer');
         const canvasCtx = canvas.getContext('2d');
-        let audioCtx, sourceNode, analyserNode, bassFilter, midFilter, trebleFilter, delayNode, feedbackGain, delayOutGain, convolverNode, reverbGain, dryGain, pannerNode, isAudioCtxInitialized = false;
+        let audioCtx, sourceNode, analyserNode, bassFilter, midFilter, trebleFilter, lowpassFilter, highpassFilter, waveShaper, delayNode, feedbackGain, delayOutGain, convolverNode, reverbGain, dryGain, pannerNode, isAudioCtxInitialized = false;
         let dynamicPanInterval; 
+
+        function makeDistortionCurve(amount) {
+            if (amount === 0) return null;
+            const k = typeof amount === 'number' ? amount : 50; const n_samples = 44100; const curve = new Float32Array(n_samples); const deg = Math.PI / 180;
+            for (let i = 0; i < n_samples; ++i) { const x = i * 2 / n_samples - 1; curve[i] = (3 + k) * x * 20 * deg / (Math.PI + k * Math.abs(x)); }
+            return curve;
+        }
 
         function createReverb(ctx) {
             const duration = 3.5; const decay = 2.0; const sampleRate = ctx.sampleRate; const length = sampleRate * duration;
@@ -931,20 +949,30 @@
                 midFilter = audioCtx.createBiquadFilter(); midFilter.type = 'peaking'; midFilter.frequency.value = 1000; midFilter.Q.value = 1;
                 trebleFilter = audioCtx.createBiquadFilter(); trebleFilter.type = 'highshelf'; trebleFilter.frequency.value = 3000;
 
+                // Vintage Filters
+                lowpassFilter = audioCtx.createBiquadFilter(); lowpassFilter.type = 'lowpass'; lowpassFilter.frequency.value = 20000;
+                highpassFilter = audioCtx.createBiquadFilter(); highpassFilter.type = 'highpass'; highpassFilter.frequency.value = 20;
+                
+                // Waveshaper (Distortion)
+                waveShaper = audioCtx.createWaveShaper(); waveShaper.oversample = '4x';
+
                 // FX Nodes
                 convolverNode = audioCtx.createConvolver(); convolverNode.buffer = createReverb(audioCtx);
                 reverbGain = audioCtx.createGain(); delayNode = audioCtx.createDelay(); delayNode.delayTime.value=0.4; 
                 feedbackGain = audioCtx.createGain(); feedbackGain.gain.value=0.3; delayOutGain = audioCtx.createGain(); 
                 dryGain = audioCtx.createGain(); pannerNode = audioCtx.createStereoPanner(); analyserNode = audioCtx.createAnalyser(); analyserNode.fftSize=256;
                 
-                // Routing: Source -> EQ -> Split (Dry/Reverb/Echo)
+                // Routing: Source -> EQ -> Bandpass -> Distortion -> Split (Dry/Reverb/Echo)
                 sourceNode.connect(bassFilter);
                 bassFilter.connect(midFilter);
                 midFilter.connect(trebleFilter);
+                trebleFilter.connect(highpassFilter);
+                highpassFilter.connect(lowpassFilter);
+                lowpassFilter.connect(waveShaper);
                 
-                trebleFilter.connect(dryGain);
-                trebleFilter.connect(convolverNode);
-                trebleFilter.connect(delayNode);
+                waveShaper.connect(dryGain);
+                waveShaper.connect(convolverNode);
+                waveShaper.connect(delayNode);
                 
                 convolverNode.connect(reverbGain);
                 reverbGain.connect(pannerNode);
@@ -967,23 +995,60 @@
 
         window.applyAudioFX = function() {
             if(!isAudioCtxInitialized) return;
-            // تحديث قيم الفلاتر بناءً على الـ Sliders
-            const b = parseFloat(document.getElementById('sl-bass').value);
-            const m = parseFloat(document.getElementById('sl-mid').value);
-            const t = parseFloat(document.getElementById('sl-treble').value);
-            const e = parseFloat(document.getElementById('sl-echo').value);
-            const r = parseFloat(document.getElementById('sl-reverb').value);
+            
+            const preset = document.getElementById('audio-fx-select').value;
+            
+            // Reset vintage filters by default
+            lowpassFilter.frequency.value = 20000;
+            highpassFilter.frequency.value = 20;
+            waveShaper.curve = null;
 
+            // Get Slider values
+            let b = parseFloat(document.getElementById('sl-bass').value);
+            let m = parseFloat(document.getElementById('sl-mid').value);
+            let t = parseFloat(document.getElementById('sl-treble').value);
+            let e = parseFloat(document.getElementById('sl-echo').value);
+            let r = parseFloat(document.getElementById('sl-reverb').value);
+
+            // Apply preset overrides
+            if(preset === 'clear') { b = -2; m = 5; t = 8; e = 0; r = 0; }
+            else if(preset === 'bass') { b = 12; m = -2; t = 2; e = 0; r = 0; }
+            else if(preset === 'mosque') { b = 2; m = 2; t = 0; r = 1.5; e = 0.1; }
+            else if(preset === 'echo') { b = 0; m = 0; t = 0; r = 0; e = 0.6; }
+            else if(preset === 'old-movie') { 
+                b = 0; m = 5; t = -5; e = 0; r = 0.1; 
+                highpassFilter.frequency.value = 400; 
+                lowpassFilter.frequency.value = 3500; 
+                waveShaper.curve = makeDistortionCurve(15); // خربشة خفيفة لفيلم أبيض وأسود
+            }
+            else if(preset === 'old-radio') { 
+                b = -5; m = 8; t = -8; e = 0; r = 0; 
+                highpassFilter.frequency.value = 800; 
+                lowpassFilter.frequency.value = 2500; 
+                waveShaper.curve = makeDistortionCurve(60); // تشويش إذاعة عالي
+            }
+            else if(preset === 'none') {
+                b = 0; m = 0; t = 0; e = 0; r = 0;
+            }
+
+            // Update UI sliders to match the preset
+            document.getElementById('sl-bass').value = b;
+            document.getElementById('sl-mid').value = m;
+            document.getElementById('sl-treble').value = t;
+            document.getElementById('sl-echo').value = e;
+            document.getElementById('sl-reverb').value = r;
+
+            // Apply to Audio Nodes
             bassFilter.gain.value = b;
             midFilter.gain.value = m;
             trebleFilter.gain.value = t;
             delayOutGain.gain.value = e;
             reverbGain.gain.value = r;
 
-            // موازنة الصوت الأصلي لمنع التضارب
+            // Balance dry volume to avoid clipping
             dryGain.gain.value = 1 - (e * 0.3) - (r * 0.2);
             
-            // تحديث الأرقام المعروضة
+            // Update Text Values
             document.getElementById('val-bass').textContent = b > 0 ? '+'+b : b;
             document.getElementById('val-mid').textContent = m > 0 ? '+'+m : m;
             document.getElementById('val-treble').textContent = t > 0 ? '+'+t : t;
@@ -991,11 +1056,13 @@
             document.getElementById('val-reverb').textContent = Math.round((r/2)*100)+'%';
         }
 
-        // عند تغيير أي مقبض يدوي
+        // Handle slider manual dragging
         document.querySelectorAll('.fx-slider').forEach(sl => {
             sl.addEventListener('input', () => {
-                document.getElementById('fx-presets').value = 'custom';
-                initAudioContext(); window.applyAudioFX();
+                document.getElementById('audio-fx-select').value = 'custom';
+                initAudioContext(); 
+                window.applyAudioFX();
+                appData.settings.audioFx = 'custom';
                 appData.settings.studio = {
                     bass: document.getElementById('sl-bass').value,
                     mid: document.getElementById('sl-mid').value,
@@ -1007,23 +1074,18 @@
             });
         });
 
-        // القوالب الجاهزة (تُحرك المقابض وتطبق فوراً)
-        document.getElementById('fx-presets').addEventListener('change', (e) => {
-            const v = e.target.value; if(v === 'custom') return;
-            let b=0, m=0, t=0, e_val=0, r=0;
-            if(v === 'clear') { b=-2; m=5; t=8; }
-            if(v === 'bass') { b=12; m=-2; t=2; }
-            if(v === 'mosque') { b=2; m=2; t=0; r=1.5; e_val=0.1; }
-            if(v === 'echo') { b=0; m=0; t=0; r=0; e_val=0.6; }
-            
-            document.getElementById('sl-bass').value = b;
-            document.getElementById('sl-mid').value = m;
-            document.getElementById('sl-treble').value = t;
-            document.getElementById('sl-echo').value = e_val;
-            document.getElementById('sl-reverb').value = r;
-            
-            initAudioContext(); window.applyAudioFX();
-            appData.settings.studio = { bass: b, mid: m, treble: t, echo: e_val, reverb: r };
+        // Handle preset changes
+        document.getElementById('audio-fx-select').addEventListener('change', (e) => {
+            initAudioContext(); 
+            window.applyAudioFX();
+            appData.settings.audioFx = e.target.value;
+            appData.settings.studio = {
+                bass: document.getElementById('sl-bass').value,
+                mid: document.getElementById('sl-mid').value,
+                treble: document.getElementById('sl-treble').value,
+                echo: document.getElementById('sl-echo').value,
+                reverb: document.getElementById('sl-reverb').value
+            };
             saveData();
         });
 
@@ -1197,7 +1259,7 @@
             appData.settings.showFloating ? startFloating() : stopFloating(); 
             if(!appData.settings.showVisualizer) canvasCtx.clearRect(0,0,canvas.width,canvas.height); 
             
-            // استرجاع أرقام الاستوديو المحفوظة
+            if(appData.settings.audioFx) document.getElementById('audio-fx-select').value = appData.settings.audioFx;
             if(appData.settings.studio) {
                 document.getElementById('sl-bass').value = appData.settings.studio.bass || 0;
                 document.getElementById('sl-mid').value = appData.settings.studio.mid || 0;
@@ -1266,7 +1328,7 @@
             const sDiv = document.getElementById('import-status'); const msg = document.getElementById('import-msg'); const prog = document.getElementById('import-progress'); const btn = document.getElementById('btn-import');
 
             if (urlInput.includes('tiktok.com')) {
-                sDiv.classList.remove('hidden'); btn.disabled = true; btn.classList.add('opacity-50'); prog.style.width = '50%'; msg.textContent = 'جاري سحب المقطع...';
+                sDiv.classList.remove('hidden'); btn.disabled = true; btn.classList.add('opacity-50'); prog.style.width = '50%'; msg.textContent = 'جاري سحب المقطع من تيك توك...';
                 try {
                     let cleanUrl = urlInput; if(cleanUrl.includes('/video/')) cleanUrl = cleanUrl.split('?')[0];
                     const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(cleanUrl)}`); const json = await res.json();
@@ -1276,7 +1338,7 @@
                         prog.style.width = '100%'; msg.textContent = `تم الاستيراد بنجاح!`; msg.className = 'text-green-400 font-bold'; saveData(); window.renderAdminTracks(); window.renderPlaylist(document.getElementById('search-input').value, false);
                         setTimeout(()=>{ sDiv.classList.add('hidden'); msg.className = 'text-white font-bold'; btn.disabled = false; btn.classList.remove('opacity-50'); document.getElementById('import-url').value = ''; }, 3000);
                     } else throw new Error('تعذر الجلب');
-                } catch(e) { msg.textContent = e.message || 'خطأ بالاتصال'; msg.className = 'text-red-400 font-bold'; btn.disabled = false; btn.classList.remove('opacity-50'); }
+                } catch(e) { msg.textContent = e.message || 'خطأ بالاتصال بتيك توك'; msg.className = 'text-red-400 font-bold'; btn.disabled = false; btn.classList.remove('opacity-50'); }
                 return;
             }
 
