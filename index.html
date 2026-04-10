@@ -566,7 +566,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDs0hSOIHyHfEZ5Z1-fN8SiEbDHV7SX91k",
@@ -584,57 +584,23 @@
 
         const customAppId = 'quran_app_v1';
         
-        // استخدام Collection بالكامل لتخزين المقاطع في ملفات مقسمة (Chunks) لتجاوز الحد الأقصى لـ Firebase
-        const quranColRef = collection(db, 'artifacts', customAppId, 'public', 'data', 'quran_data_chunks');
+        // استخدام مسار جديد وموحد (quran_data_v2) لضمان بيئة نظيفة ومزامنة دقيقة (Atomic Sync)
+        const quranDocRef = doc(db, 'artifacts', customAppId, 'public', 'data', 'quran_data_v2', 'main');
         let currentUser = null;
 
-        // نظام الحفظ الذكي المُقسم (Dynamic Chunking Engine)
         window.firebaseSaveData = async (data) => {
             if (!currentUser) return;
             try {
                 // إعطاء طابع زمني لمعرفة النسخة الأحدث
-                const currentTimestamp = Date.now();
-                data.lastUpdated = currentTimestamp;
-
-                // 1. حفظ الإعدادات والأقسام في ملف رئيسي
-                const metaData = {
-                    settings: data.settings,
-                    categories: data.categories,
-                    lastUpdated: currentTimestamp,
-                    isMeta: true
-                };
+                data.lastUpdated = Date.now();
                 
-                await setDoc(doc(quranColRef, 'main'), {
-                    payload: LZString.compressToBase64(JSON.stringify(metaData)),
-                    isCompressedBase64: true
-                });
-
-                // 2. تقطيع المقاطع (كل 1500 مقطع في ملف) لتجنب مشكلة الـ 20,000 Index في Firebase
-                const CHUNK_SIZE = 1500;
-                const trackChunks = [];
-                for (let i = 0; i < data.tracks.length; i += CHUNK_SIZE) {
-                    trackChunks.push(data.tracks.slice(i, i + CHUNK_SIZE));
+                // ضغط البيانات كلها في نص واحد (لحل مشكلة 20,000 فهرس) وحفظها ككتلة واحدة (Atomic) لمنع تضارب المتصفحات
+                if (typeof LZString !== 'undefined') {
+                    const compressedData = LZString.compressToBase64(JSON.stringify(data));
+                    await setDoc(quranDocRef, { payload: compressedData, isCompressedBase64: true, lastUpdated: data.lastUpdated });
                 }
-
-                // رفع الملفات المقطعة
-                for (let i = 0; i < trackChunks.length; i++) {
-                    await setDoc(doc(quranColRef, 'tracks_chunk_' + i), {
-                        payload: LZString.compressToBase64(JSON.stringify(trackChunks[i])),
-                        isCompressedBase64: true,
-                        chunkIndex: i
-                    });
-                }
-                
-                // مسح الملفات الزائدة (إن وجد) بتفريغها للحفاظ على النظام
-                for (let i = trackChunks.length; i < 15; i++) {
-                     await setDoc(doc(quranColRef, 'tracks_chunk_' + i), {
-                        payload: LZString.compressToBase64(JSON.stringify([])),
-                        isCompressedBase64: true
-                    });
-                }
-
             } catch (error) {
-                console.error("خطأ أثناء حفظ البيانات المقسمة:", error);
+                console.error("خطأ أثناء الحفظ في قاعدة البيانات:", error);
             }
         };
 
@@ -646,10 +612,10 @@
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
-                // استماع ذكي للملفات المقطعة
-                onSnapshot(quranColRef, (snapshot) => {
-                    if (snapshot.empty) {
-                        // لو الفايربيز فاضي، ارفع المحلي
+                // استماع للملف الموحد
+                onSnapshot(quranDocRef, (docSnap) => {
+                    if (!docSnap.exists()) {
+                        // لو الفايربيز فاضي، ارفع المحلي (افتح المتصفح الذي به المقاطع الصحيحة أولاً ليتم الرفع)
                         const localDataStr = localStorage.getItem('quran_pro_data_v4');
                         if (localDataStr) {
                             let parsed = JSON.parse(localDataStr);
@@ -659,50 +625,18 @@
                         return;
                     }
 
-                    let cloudMeta = null;
-                    let cloudTracks = [];
-
-                    snapshot.forEach(docSnap => {
-                        const d = docSnap.data();
-                        let parsedObj = null;
-                        
-                        try {
-                            if (d.isCompressedBase64 && d.payload) {
-                                parsedObj = JSON.parse(LZString.decompressFromBase64(d.payload));
-                            }
-                        } catch(e) { console.error("Decompression failed for doc:", docSnap.id); }
-
-                        if (parsedObj) {
-                            if (docSnap.id === 'main') {
-                                cloudMeta = parsedObj;
-                            } else if (docSnap.id.startsWith('tracks_chunk_')) {
-                                if (Array.isArray(parsedObj)) {
-                                    cloudTracks = cloudTracks.concat(parsedObj);
-                                }
-                            }
+                    const cloudData = docSnap.data();
+                    let parsedObj = null;
+                    
+                    try {
+                        if (cloudData.isCompressedBase64 && cloudData.payload) {
+                            parsedObj = JSON.parse(LZString.decompressFromBase64(cloudData.payload));
                         }
-                    });
+                    } catch(e) { console.error("Decompression failed", e); }
 
-                    if (cloudMeta && window.updateAppDataFromFirebase) {
-                        const assembledCloudData = {
-                            settings: cloudMeta.settings,
-                            categories: cloudMeta.categories,
-                            tracks: cloudTracks,
-                            lastUpdated: cloudMeta.lastUpdated || 0
-                        };
-
-                        // نظام التعافي وحل صراعات المزامنة
-                        let localDataStr = localStorage.getItem('quran_pro_data_v4');
-                        let localData = localDataStr ? JSON.parse(localDataStr) : null;
-                        let localTime = (localData && localData.lastUpdated) ? localData.lastUpdated : 0;
-
-                        // تحديث المتصفح فقط إذا كانت نسخة الفايربيز "أحدث أو تساوي" نسخة المتصفح
-                        if (assembledCloudData.lastUpdated >= localTime) {
-                            window.updateAppDataFromFirebase(assembledCloudData);
-                        } else if (localData) {
-                            // إذا كانت نسخة المتصفح "أحدث" (لأن الفايربيز فشل في الحفظ مسبقاً)، نفرض نسخة المتصفح على الفايربيز!
-                            window.firebaseSaveData(localData);
-                        }
+                    if (parsedObj && window.updateAppDataFromFirebase) {
+                        // تحديث التطبيق بالبيانات القادمة من السحابة
+                        window.updateAppDataFromFirebase(parsedObj);
                     }
                 }, (error) => console.error("Live Sync error:", error));
             }
@@ -710,13 +644,6 @@
     </script>
 
     <script>
-        // تعريف المتغيرات الأساسية للواجهة
-        const recordLogo = document.getElementById('record-logo-container');
-        const playIcon = document.getElementById('play-icon');
-        const seekBar = document.getElementById('seek-bar');
-        const curTimeEl = document.getElementById('current-time');
-        const durEl = document.getElementById('duration');
-
         // ==========================================
         // 1. DATA STRUCTURE, SANITIZATION & GLOBAL
         // ==========================================
@@ -801,6 +728,20 @@
             if(!nameInput.value && !url.includes('tiktok.com')) nameInput.value = autoCleanName(url); 
         };
 
+        window.updateAppDataFromFirebase = function(newData) {
+            if (newData) {
+                appData = sanitizeData(newData);
+                localStorage.setItem('quran_pro_data_v4', JSON.stringify(appData));
+                applySettings(); updateStats();
+                const s = document.getElementById('search-input'); 
+                window.renderPlaylist(s ? s.value : '', false);
+                if (!document.getElementById('dashboard-modal').classList.contains('hidden')) { 
+                    window.renderAdminCats(); 
+                    window.renderAdminTracks(); 
+                }
+            }
+        };
+
         // ==========================================
         // 2. AUDIO & ADHAN & INTRO
         // ==========================================
@@ -809,6 +750,12 @@
         const adhanAudioEl = document.getElementById('adhan-audio');
         const introAudioEl = document.getElementById('intro-audio');
         let activeAudio = mainAudioEl;
+        
+        const recordLogo = document.getElementById('record-logo-container');
+        const playIcon = document.getElementById('play-icon');
+        const seekBar = document.getElementById('seek-bar');
+        const curTimeEl = document.getElementById('current-time');
+        const durEl = document.getElementById('duration');
 
         function bindAudioEvents(audio) {
             audio.addEventListener('play', (e) => { if(e.target===activeAudio) updatePlayState(); });
@@ -1520,7 +1467,7 @@
         window.bulkDelete = function() { 
             const ids = getSelIds(); 
             if(ids.length && confirm(`حذف ${ids.length}؟`)){ 
-                appData.tracks = appData.tracks.filter(t=>!ids.includes(t.id)); 
+                appData.tracks = appData.tracks.filter(t=>t.id!==ids.includes(t.id)); 
                 saveData(); 
                 window.renderAdminTracks(); 
                 window.renderPlaylist(document.getElementById('search-input').value, false); 
