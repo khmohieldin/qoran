@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تلاوات نادرة | منصة القرآن الكريم الاحترافية</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: { 900: '#0b1120', 800: '#111827', 700: '#1f2937', 600: '#374151' },
+                        gold: { 400: '#f3e5ab', 500: '#d4af37', 600: '#aa8c2c' }
+                    },
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif'],
+                        serif: ['Amiri', 'serif'],
+                    },
+                    animation: {
+                        'spin-slow': 'spin 8s linear infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'pulse-glow': 'pulseGlow 2s infinite',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 15px rgba(212,175,55,0.4)' },
+                            '50%': { boxShadow: '0 0 35px rgba(212,175,55,0.8)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #0b1120; color: #f3f4f6; overflow-x: hidden; }
+        
+        /* Professional Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #111827; }
+        ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #aa8c2c; }
+        
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+
+        /* Glass Panels */
+        .glass-panel {
+            background: rgba(31, 41, 55, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Range Sliders */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%;
+            background: #d4af37; cursor: pointer; margin-top: -5px; box-shadow: 0 0 8px rgba(212,175,55,0.6);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; cursor: pointer; background: #374151; border-radius: 2px;
+        }
+
+        .pause-animation { animation-play-state: paused !important; }
+
+        /* Ticker Animation (Left to Right) */
+        @keyframes ticker-scroll {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100vw); }
+        }
+        .animate-ticker {
+            display: inline-flex;
+            white-space: nowrap;
+            animation: ticker-scroll var(--ticker-speed, 30s) linear infinite;
+        }
+        .animate-ticker:hover {
+            animation-play-state: paused;
+        }
+
+        /* Floating Letters Effect */
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg) scale(0.8); opacity: 0; }
+            10% { opacity: 0.15; }
+            90% { opacity: 0.15; }
+            100% { transform: translateY(-20vh) rotate(360deg) scale(1.5); opacity: 0; }
+        }
+        .floating-letter {
+            position: absolute; color: #d4af37; font-family: 'Amiri', serif;
+            animation: floatUp linear infinite; opacity: 0; pointer-events: none; user-select: none;
+        }
+
+        /* Accordion transition */
+        .accordion-content { transition: max-height 0.3s ease-out; overflow: hidden; max-height: 0; }
+        .accordion-content.open { max-height: 2000px; overflow-y: auto;}
+
+        /* Custom Checkbox */
+        .custom-checkbox { width: 1.2rem; height: 1.2rem; accent-color: #d4af37; cursor: pointer;}
+        
+        /* Advanced Visualizer Glow */
+        #visualizer { filter: drop-shadow(0px 0px 4px rgba(212,175,55,0.6)); }
+    </style>
+</head>
+<body class="font-sans min-h-screen pb-10 relative flex flex-col">
+
+    <!-- Floating Background Layer -->
+    <div id="floating-bg" class="fixed inset-0 z-0 overflow-hidden pointer-events-none"></div>
+
+    <!-- Header -->
+    <header class="bg-dark-800 text-gold-500 py-6 shadow-2xl relative z-10 border-b border-gold-500/20">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-serif font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-l from-gold-500 to-gold-400">تلاوات نادرة</h1>
+                <p class="text-gray-400 text-sm mt-1">المنصة الصوتية الاحترافية للقرآن الكريم</p>
+            </div>
+            <button onclick="openDashboardLogin()" class="bg-dark-700 hover:bg-dark-600 text-gold-500 p-3 rounded-full transition shadow-lg border border-gold-500/30 group" title="لوحة التحكم">
+                <i class="fas fa-shield-alt text-xl group-hover:scale-110 transition-transform"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 mt-6 max-w-7xl flex-1 relative z-10">
+        
+        <!-- Professional Scrolling Stats Bar -->
+        <div class="glass-panel rounded-xl overflow-hidden mb-8 flex items-center px-4 py-3 border border-gold-500/30 shadow-lg">
+            <div class="shrink-0 text-gold-500 font-bold ml-4 border-l border-dark-600 pl-4 flex items-center gap-2 z-10 bg-dark-800/80 p-1 rounded">
+                <i class="fas fa-chart-line"></i> إحصائيات
+            </div>
+            <div class="flex-1 overflow-hidden relative" dir="ltr">
+                <div id="stats-ticker" class="animate-ticker text-sm text-gray-300 flex items-center gap-16" dir="rtl">
+                    جاري تحميل الإحصائيات...
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Right Column: Professional Player -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="glass-panel rounded-2xl p-6 relative overflow-hidden text-center sticky top-6">
+                    <!-- Player UI -->
+                    <div class="relative w-48 h-48 mx-auto mb-6">
+                        <div id="record-logo" class="w-full h-full rounded-full border-4 border-gold-500 overflow-hidden shadow-[0_0_30px_rgba(212,175,55,0.4)] pause-animation animate-spin-slow">
+                            <img id="logo-img" src="" alt="شعار القارئ" class="w-full h-full object-cover">
+                        </div>
+                        <div class="absolute inset-0 m-auto w-10 h-10 bg-dark-900 rounded-full border-2 border-gold-500"></div>
+                    </div>
+
+                    <h2 id="now-playing-title" class="text-2xl font-bold font-serif text-gold-400 mb-2 truncate px-2">لم يتم اختيار تلاوة</h2>
+                    <span id="now-playing-category" class="inline-block bg-dark-800 border border-dark-600 text-gray-300 text-xs px-3 py-1 rounded-full mb-4">---</span>
+
+                    <!-- Advanced Centered Audio Visualizer Canvas -->
+                    <canvas id="visualizer" class="w-full h-20 rounded-lg mb-4 opacity-90 mx-auto block" width="300" height="80"></canvas>
+
+                    <!-- Progress Bar -->
+                    <div class="mb-6">
+                        <input type="range" id="seek-bar" value="0" class="w-full">
+                        <div class="flex justify-between text-xs text-gray-400 mt-2 font-mono">
+                            <span id="current-time">00:00</span>
+                            <span id="duration">00:00</span>
+                        </div>
+                    </div>
+
+                    <!-- Main Controls -->
+                    <div class="flex justify-center items-center gap-8 mb-6">
+                        <button id="btn-backward" class="text-gray-400 hover:text-gold-500 transition transform hover:scale-110" title="تأخير 10 ثواني">
+                            <i class="fas fa-rotate-right text-2xl"></i>
+                        </button>
+                        <button id="btn-play-pause" class="w-20 h-20 bg-gradient-to-tr from-gold-600 to-gold-400 text-dark-900 rounded-full flex items-center justify-center hover:scale-105 shadow-[0_0_20px_rgba(212,175,55,0.4)] transition transform">
+                            <i class="fas fa-play text-3xl ml-1" id="play-icon"></i>
+                        </button>
+                        <button id="btn-forward" class="text-gray-400 hover:text-gold-500 transition transform hover:scale-110" title="تقديم 10 ثواني">
+                            <i class="fas fa-rotate-left text-2xl"></i>
+                        </button>
+                    </div>
+
+                    <hr class="border-dark-600 mb-4">
+
+                    <!-- Advanced Controls (Audio Effects) -->
+                    <div class="space-y-4 px-2 text-right">
+                        <!-- Volume -->
+                        <div class="flex items-center gap-3" dir="ltr">
+                            <i class="fas fa-volume-up text-gold-500"></i>
+                            <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1" class="flex-1">
+                            <i class="fas fa-volume-down text-gray-500"></i>
+                        </div>
+                        
+                        <!-- Audio FX & Stereo -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <!-- Stereo Preset -->
+                            <div class="bg-dark-800 rounded-lg p-2 border border-dark-600 flex flex-col gap-1">
+                                <label class="text-[10px] text-gold-500 font-bold ml-2 whitespace-nowrap"><i class="fas fa-headphones mr-1"></i> الاستريو</label>
+                                <select id="stereo-select" class="bg-dark-700 text-gray-200 text-xs rounded p-1 outline-none focus:border-gold-500 w-full text-center">
+                                    <option value="0">افتراضي</option>
+                                    <option value="1">يمين</option>
+                                    <option value="-1">يسار</option>
+                                    <option value="dynamic">محيطي ديناميكي</option>
+                                </select>
+                            </div>
+
+                            <!-- Audio Filters (Studio FX) -->
+                            <div class="bg-dark-800 rounded-lg p-2 border border-dark-600 flex flex-col gap-1">
+                                <label class="text-[10px] text-gold-500 font-bold ml-2 whitespace-nowrap"><i class="fas fa-magic mr-1"></i> فلاتر الاستوديو</label>
+                                <select id="audio-fx-select" class="bg-dark-700 text-gray-200 text-xs rounded p-1 outline-none focus:border-gold-500 w-full text-center">
+                                    <option value="none">صوت أصلي</option>
+                                    <option value="clear">نقي للغاية (Clear)</option>
+                                    <option value="bass">تضخيم عميق (Bass)</option>
+                                    <option value="mosque">تأثير المسجد (Reverb)</option>
+                                    <option value="echo">صدى صوت (Echo)</option>
+                                    <option value="radio">راديو قديم (Radio)</option>
+                                    <option value="vinyl">مخرفش عتيق (Vinyl)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Audio Elements: Dual setup to fix TikTok CORS muting -->
+                    <audio id="main-audio" crossorigin="anonymous"></audio>
+                    <audio id="fallback-audio"></audio> 
+                    <audio id="adhan-audio"></audio>
+                </div>
+            </div>
+
+            <!-- Left Column: Playlist -->
+            <div class="lg:col-span-2">
+                <div class="glass-panel rounded-2xl p-6 min-h-[600px] flex flex-col">
+                    <div class="flex justify-between items-center mb-6 border-b border-dark-600 pb-3">
+                        <h2 class="text-2xl font-bold font-serif text-gold-500">
+                            <i class="fas fa-list-ul ml-2"></i>المكتبة الصوتية
+                        </h2>
+                        <!-- Fast Search -->
+                        <div class="relative w-1/2">
+                            <input type="text" id="search-input" placeholder="ابحث عن تلاوة..." class="w-full bg-dark-800 border border-dark-600 rounded-full px-4 py-2 text-sm text-white focus:outline-none focus:border-gold-500 pr-10">
+                            <i class="fas fa-search absolute right-3 top-2.5 text-gray-400"></i>
+                        </div>
+                    </div>
+
+                    <!-- Categories Container (Accordions) -->
+                    <div id="playlist-container" class="space-y-4 flex-1 overflow-y-auto custom-scroll pr-2">
+                        <!-- Rendered via JS -->
+                    </div>
+                    
+                    <div id="empty-state" class="hidden text-center py-12 m-auto">
+                        <i class="fas fa-folder-open text-6xl text-dark-600 mb-4"></i>
+                        <h3 class="text-xl font-bold text-gray-400 mb-2">لا توجد مقاطع</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- MODALS SECTION -->
+    <!-- ---------------------------------------------------- -->
+
+    <!-- Adhan Overlay -->
+    <div id="adhan-overlay" class="fixed inset-0 bg-dark-900/95 z-[70] hidden flex items-center justify-center backdrop-blur-xl">
+        <div class="text-center animate-pulse-glow p-10 rounded-full border border-gold-500/30 bg-dark-800 relative">
+            <div class="absolute inset-0 bg-gold-500 opacity-5 rounded-full animate-ping"></div>
+            <i class="fas fa-mosque text-7xl text-gold-500 mb-6 drop-shadow-lg"></i>
+            <h2 class="text-4xl font-serif font-bold text-gold-400 mb-2">حان الآن موعد أذان <span id="adhan-prayer-name" class="text-white">...</span></h2>
+            <p class="text-gray-400 text-lg mb-8">حسب التوقيت المحلي لمدينة القاهرة</p>
+            
+            <div class="flex flex-col items-center gap-4 relative z-10">
+                <button id="adhan-play-btn" onclick="forcePlayAdhan()" class="hidden bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold px-6 py-2 rounded-full transition text-sm mb-2 shadow-lg">
+                    <i class="fas fa-volume-up mr-1"></i> تشغيل صوت الأذان
+                </button>
+                <button onclick="skipAdhan()" class="bg-dark-700 hover:bg-dark-600 border border-dark-500 text-gray-300 px-6 py-2 rounded-full transition text-sm">
+                    <i class="fas fa-times mr-1"></i> تخطي وإغلاق
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-black/90 z-[60] hidden flex items-center justify-center backdrop-blur-md">
+        <div class="bg-dark-800 border border-gold-500/30 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl">
+            <i class="fas fa-lock text-4xl text-gold-500 mb-4"></i>
+            <h2 class="text-2xl font-bold text-white mb-6">حماية لوحة التحكم</h2>
+            <input type="password" id="admin-password" placeholder="كلمة المرور" class="w-full bg-dark-900 border border-dark-600 rounded-lg px-4 py-3 text-center text-white mb-4 focus:outline-none focus:border-gold-500" onkeypress="if(event.key==='Enter') checkPassword()">
+            <div class="flex gap-2">
+                <button onclick="checkPassword()" class="flex-1 bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold py-2 rounded-lg transition">دخول</button>
+                <button onclick="closeModal('login-modal')" class="flex-1 bg-dark-700 hover:bg-dark-600 text-white font-bold py-2 rounded-lg transition">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard Modal -->
+    <div id="dashboard-modal" class="fixed inset-0 bg-black/95 z-[50] hidden flex items-center justify-center backdrop-blur-lg">
+        <div class="bg-dark-800 border border-gold-500/50 rounded-2xl shadow-2xl w-full max-w-6xl h-[95vh] flex flex-col overflow-hidden relative">
+            
+            <!-- Dashboard Header -->
+            <div class="bg-dark-900 border-b border-dark-600 p-4 flex justify-between items-center shrink-0">
+                <h2 class="text-2xl font-serif font-bold text-gold-500"><i class="fas fa-sliders-h ml-2"></i>لوحة التحكم الاحترافية</h2>
+                <button onclick="closeModal('dashboard-modal')" class="text-gray-400 hover:text-red-500 transition"><i class="fas fa-times text-2xl"></i></button>
+            </div>
+
+            <div class="flex flex-1 overflow-hidden">
+                <!-- Sidebar Tabs -->
+                <div class="w-56 bg-dark-900 border-l border-dark-600 flex flex-col shrink-0 text-sm">
+                    <button class="dash-tab active p-4 text-right border-b border-dark-700 text-gold-500 font-bold hover:bg-dark-800 transition" onclick="switchTab('tab-settings')"><i class="fas fa-cog w-5 text-center"></i> الإعدادات</button>
+                    <button class="dash-tab p-4 text-right border-b border-dark-700 text-gray-400 hover:text-gold-500 hover:bg-dark-800 transition" onclick="switchTab('tab-categories')"><i class="fas fa-tags w-5 text-center"></i> إدارة الأقسام</button>
+                    <button class="dash-tab p-4 text-right border-b border-dark-700 text-gray-400 hover:text-gold-500 hover:bg-dark-800 transition" onclick="switchTab('tab-tracks')"><i class="fas fa-music w-5 text-center"></i> إدارة المقاطع</button>
+                    <button class="dash-tab p-4 text-right border-b border-dark-700 text-gray-400 hover:text-gold-500 hover:bg-dark-800 transition" onclick="switchTab('tab-import')"><i class="fas fa-cloud-download-alt w-5 text-center"></i> استيراد من أرشيف</button>
+                </div>
+
+                <!-- Content Area -->
+                <div class="flex-1 p-4 md:p-6 overflow-y-auto custom-scroll bg-dark-800 relative">
+                    
+                    <!-- Tab 1: Settings -->
+                    <div id="tab-settings" class="tab-content">
+                        <!-- Settings Content -->
+                        <h3 class="text-xl font-bold text-white mb-6 border-b border-dark-600 pb-2">إعدادات الموقع العامة والأذان</h3>
+                        <div class="space-y-4 max-w-xl">
+                            <div>
+                                <label class="block text-sm text-gray-300 mb-2">رابط صورة الشعار الدوار</label>
+                                <input type="url" id="setting-logo" class="w-full px-4 py-2 rounded bg-dark-900 border border-dark-600 text-white text-left" dir="ltr">
+                            </div>
+                            
+                            <hr class="border-dark-600 my-4">
+                            <h4 class="text-gold-500 font-bold text-sm"><i class="fas fa-mosque"></i> إعدادات الأذان التلقائي (توقيت القاهرة)</h4>
+                            
+                            <div class="flex items-center justify-between bg-dark-900 p-4 rounded border border-dark-600">
+                                <div><p class="font-bold text-white">تفعيل الأذان وإيقاف التلاوة مؤقتاً</p></div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="setting-adhan-enable" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-dark-600 peer-focus:outline-none rounded-full peer peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gold-600"></div>
+                                </label>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm text-gray-300 mb-2">رابط أذان الفجر (مخصص)</label>
+                                <div class="flex gap-2 mb-3">
+                                    <input type="url" id="setting-adhan-fajr" class="flex-1 px-4 py-2 rounded bg-dark-900 border border-dark-600 text-white text-left" dir="ltr" placeholder="رابط مباشر أو من تيك توك">
+                                    <button type="button" onclick="testAdhan('الفجر')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded transition" title="اختبار الأذان">
+                                        <i class="fas fa-play"></i> اختبار الفجر
+                                    </button>
+                                </div>
+                                
+                                <label class="block text-sm text-gray-300 mb-2">رابط الأذان لباقي الصلوات</label>
+                                <div class="flex gap-2">
+                                    <input type="url" id="setting-adhan-general" class="flex-1 px-4 py-2 rounded bg-dark-900 border border-dark-600 text-white text-left" dir="ltr" placeholder="رابط مباشر أو من تيك توك">
+                                    <button type="button" onclick="testAdhan('العشاء')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded transition" title="اختبار الأذان">
+                                        <i class="fas fa-play"></i> اختبار
+                                    </button>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2">
+                                    ملاحظة هامة: يدعم النظام الآن روابط مباشرة للملفات الصوتية، بالإضافة إلى <b>روابط مقاطع تيك توك</b>. النظام سيستخرج الصوت منها تلقائياً.
+                                </p>
+                            </div>
+
+                            <hr class="border-dark-600 my-4">
+                            <h4 class="text-gold-500 font-bold text-sm"><i class="fas fa-paint-brush"></i> المظهر والتأثيرات</h4>
+
+                            <div class="flex items-center justify-between bg-dark-900 p-4 rounded border border-dark-600">
+                                <div><p class="font-bold text-white">تأثير الحروف الإسلامية المتناثرة</p></div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="setting-floating" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-dark-600 peer-focus:outline-none rounded-full peer peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gold-600"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between bg-dark-900 p-4 rounded border border-dark-600">
+                                <div><p class="font-bold text-white">الموجات الصوتية بالمنتصف (Visualizer)</p></div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="setting-visualizer" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-dark-600 peer-focus:outline-none rounded-full peer peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gold-600"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between bg-dark-900 p-4 rounded border border-dark-600">
+                                <div><p class="font-bold text-white">سرعة شريط الإحصائيات</p></div>
+                                <div class="flex items-center gap-3 w-1/3" dir="ltr">
+                                    <input type="range" id="setting-ticker-speed" min="10" max="80" value="30" class="flex-1" oninput="document.getElementById('ticker-speed-val').textContent=this.value+'s'">
+                                    <span id="ticker-speed-val" class="text-gold-400 text-xs font-mono">30s</span>
+                                </div>
+                            </div>
+                            <button onclick="saveSettings()" class="bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold py-2 px-6 rounded transition mt-4 w-full">حفظ جميع الإعدادات</button>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Categories -->
+                    <div id="tab-categories" class="tab-content hidden">
+                        <!-- Categories Content -->
+                        <h3 class="text-xl font-bold text-white mb-6 border-b border-dark-600 pb-2">إدارة الأقسام (يمكنك إعادة الترتيب بالأسهم)</h3>
+                        <form id="cat-form" class="flex gap-4 mb-8 bg-dark-900 p-4 rounded border border-dark-600">
+                            <input type="hidden" id="cat-id">
+                            <div class="flex-1">
+                                <label class="block text-xs text-gray-400 mb-1">اسم القسم</label>
+                                <input type="text" id="cat-name" required class="w-full px-3 py-2 rounded bg-dark-800 border border-dark-500 text-white focus:border-gold-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">اللون</label>
+                                <input type="color" id="cat-color" value="#d4af37" class="w-12 h-10 rounded cursor-pointer bg-dark-800 border border-dark-500">
+                            </div>
+                            <div class="flex items-end gap-2">
+                                <button type="submit" id="cat-submit" class="bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold py-2 px-4 rounded h-10">إضافة</button>
+                                <button type="button" onclick="resetCatForm()" class="bg-dark-600 hover:bg-dark-500 text-white font-bold py-2 px-4 rounded h-10 hidden" id="cat-cancel">إلغاء</button>
+                            </div>
+                        </form>
+                        <div id="admin-cats-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                    </div>
+
+                    <!-- Tab 3: Tracks (Expanded & Bulk Actions Added) -->
+                    <div id="tab-tracks" class="tab-content hidden flex flex-col h-full">
+                        <h3 class="text-xl font-bold text-white mb-4 border-b border-dark-600 pb-2">إدارة المقاطع الشاملة</h3>
+                        
+                        <!-- Compact Add Form -->
+                        <form id="track-form" class="bg-dark-900 p-3 rounded border border-dark-600 mb-4 shrink-0 grid grid-cols-1 md:grid-cols-4 gap-3">
+                            <input type="hidden" id="trk-id">
+                            <div class="md:col-span-2">
+                                <input type="url" id="trk-url" required placeholder="رابط المصدر المباشر أو تيك توك" class="w-full px-3 py-2 rounded bg-dark-800 border border-dark-500 text-white focus:border-gold-500 outline-none text-left text-sm" dir="ltr" oninput="autoExtractName(this.value)">
+                            </div>
+                            <div>
+                                <input type="text" id="trk-name" required placeholder="اسم التلاوة" class="w-full px-3 py-2 rounded bg-dark-800 border border-dark-500 text-white focus:border-gold-500 outline-none text-sm">
+                            </div>
+                            <div class="flex gap-2">
+                                <select id="trk-cat" required class="w-full px-3 py-2 rounded bg-dark-800 border border-dark-500 text-white focus:border-gold-500 outline-none text-sm"></select>
+                                <button type="submit" id="trk-submit" class="bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold px-4 rounded text-sm whitespace-nowrap"><i class="fas fa-plus"></i></button>
+                                <button type="button" onclick="resetTrackForm()" class="bg-dark-600 hover:bg-dark-500 text-white font-bold px-3 rounded hidden" id="trk-cancel"><i class="fas fa-times"></i></button>
+                            </div>
+                        </form>
+                        
+                        <div class="flex justify-between items-center mb-2 shrink-0">
+                            <div class="flex gap-2 items-center">
+                                <h4 class="font-bold text-gold-400">سجل المقاطع</h4>
+                                <span id="selected-count" class="text-xs bg-dark-700 px-2 py-1 rounded text-white hidden">محدد: 0</span>
+                            </div>
+                            <input type="text" id="admin-search-track" placeholder="بحث لفلترة الجدول..." class="bg-dark-900 border border-dark-600 rounded px-3 py-1 text-sm text-white focus:border-gold-500 w-1/3" onkeyup="renderAdminTracks()">
+                        </div>
+
+                        <!-- Bulk Actions Toolbar -->
+                        <div id="bulk-toolbar" class="hidden bg-dark-700 border border-gold-500/30 p-2 rounded-t mb-0 shrink-0 flex flex-wrap gap-3 items-center">
+                            <span class="text-sm font-bold text-gold-500 ml-2"><i class="fas fa-magic"></i> إجراءات جماعية:</span>
+                            
+                            <div class="flex items-center gap-1">
+                                <select id="bulk-cat" class="text-sm px-2 py-1 rounded bg-dark-800 text-white border border-dark-500 outline-none"></select>
+                                <button onclick="bulkChangeCategory()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1 rounded font-bold transition">نقل للقسم</button>
+                            </div>
+
+                            <div class="flex items-center gap-1 border-r border-dark-500 pr-3">
+                                <input type="text" id="bulk-rename-base" placeholder="الاسم (مثال: سورة...)" class="text-sm px-2 py-1 rounded bg-dark-800 text-white border border-dark-500 outline-none w-40">
+                                <button onclick="bulkRename()" class="bg-green-600 hover:bg-green-500 text-white text-xs px-3 py-1 rounded font-bold transition" title="سيضيف تسلسل رقمي تلقائياً">إعادة تسمية بـتسلسل</button>
+                            </div>
+
+                            <button onclick="bulkDelete()" class="mr-auto bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1 rounded font-bold transition"><i class="fas fa-trash"></i> حذف المحدد</button>
+                        </div>
+
+                        <!-- Tracks Table (Expands to fill space) -->
+                        <div class="flex-1 overflow-y-auto custom-scroll bg-dark-900 rounded-b border border-dark-600 shadow-inner relative min-h-[300px]">
+                            <table class="w-full text-sm text-right text-gray-300">
+                                <thead class="text-xs text-gold-500 bg-dark-800 sticky top-0 z-10 shadow-md border-b border-dark-600">
+                                    <tr>
+                                        <th class="px-3 py-3 w-10 text-center"><input type="checkbox" id="check-all" class="custom-checkbox" onclick="toggleAllTracks(this)"></th>
+                                        <th class="px-4 py-3">الاسم (اضغط للتعديل السريع)</th>
+                                        <th class="px-4 py-3">القسم</th>
+                                        <th class="px-4 py-3 text-center w-24">إجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-tracks-list" class="divide-y divide-dark-600">
+                                    <!-- Tracks row -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab 4: Archive Import -->
+                    <div id="tab-import" class="tab-content hidden">
+                        <h3 class="text-xl font-bold text-white mb-6 border-b border-dark-600 pb-2">استيراد ذكي من أرشيف الإنترنت</h3>
+                        <div class="bg-dark-900 p-6 rounded border border-dark-600 max-w-2xl">
+                            <p class="text-gray-400 text-sm mb-4">ضع رابط صفحة أرشيف الإنترنت، وسيقوم النظام بجلب جميع ملفات MP3 وتنقيتها.</p>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-white mb-1">رابط صفحة الأرشيف *</label>
+                                    <input type="url" id="import-url" placeholder="https://archive.org/details/..." class="w-full px-4 py-3 rounded bg-dark-800 border border-dark-500 text-white focus:border-gold-500 outline-none text-left" dir="ltr">
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-bold text-white mb-1">إضافة إلى قسم *</label>
+                                        <select id="import-cat" class="w-full px-4 py-2 rounded bg-dark-800 border border-dark-500 text-white focus:border-gold-500 outline-none"></select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-bold text-white mb-1">تسمية وترقيم جماعي (اختياري)</label>
+                                        <input type="text" id="import-base-name" placeholder="مثال: الشيخ عبد الباسط المقطع" title="إذا تركتها فارغة، سيتم سحب الأسماء من الرابط" class="w-full px-4 py-2 rounded bg-dark-800 border border-dark-500 text-white focus:border-gold-500 outline-none">
+                                    </div>
+                                </div>
+                                <button onclick="startBulkImport()" id="btn-import" class="w-full bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold py-3 rounded transition flex justify-center items-center gap-2 mt-4">
+                                    <i class="fas fa-cloud-download-alt"></i> بدء سحب المقاطع
+                                </button>
+                                
+                                <div id="import-status" class="hidden mt-4 p-4 rounded bg-dark-800 border border-dark-500 text-center">
+                                    <i class="fas fa-spinner fa-spin text-gold-500 text-2xl mb-2"></i>
+                                    <p id="import-msg" class="text-white font-bold">جاري الاتصال بالأرشيف...</p>
+                                    <div class="w-full bg-dark-600 rounded-full h-2 mt-3 overflow-hidden">
+                                        <div id="import-progress" class="bg-gold-500 h-2 rounded-full w-0 transition-all duration-300"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Firebase Integration -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDs0hSOIHyHfEZ5Z1-fN8SiEbDHV7SX91k",
+            authDomain: "shubra-market-bfe4d.firebaseapp.com",
+            projectId: "shubra-market-bfe4d",
+            storageBucket: "shubra-market-bfe4d.firebasestorage.app",
+            messagingSenderId: "49550189480",
+            appId: "1:49550189480:web:234f1c4e55125360e6f39d",
+            measurementId: "G-5MN088EQS7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const customAppId = 'quran_app_v1';
+        const quranDocRef = doc(db, 'artifacts', customAppId, 'public', 'data', 'quran_data', 'main');
+
+        let currentUser = null;
+
+        window.firebaseSaveData = async (data) => {
+            if (!currentUser) return;
+            try {
+                await setDoc(quranDocRef, data);
+            } catch (error) {
+                console.error("خطأ أثناء الحفظ في قاعدة البيانات:", error);
+            }
+        };
+
+        const initAuth = async () => {
+            try {
+                await signInAnonymously(auth);
+            } catch(e) {
+                console.error("خطأ المصادقة", e);
+            }
+        };
+
+        initAuth();
+
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                onSnapshot(quranDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const cloudData = docSnap.data();
+                        if (window.updateAppDataFromFirebase) {
+                            window.updateAppDataFromFirebase(cloudData);
+                        }
+                    } else {
+                        const localDataStr = localStorage.getItem('quran_pro_data_v4');
+                        if (localDataStr) {
+                            window.firebaseSaveData(JSON.parse(localDataStr));
+                        }
+                    }
+                }, (error) => {
+                    console.error("خطأ في المزامنة الحية:", error);
+                });
+            }
+        });
+    </script>
+
+    <!-- Application Logic -->
+    <script>
+        // ==========================================
+        // 1. DATA STRUCTURE & INITIALIZATION
+        // ==========================================
+        const DEFAULT_DATA = {
+            settings: {
+                logoUrl: 'https://images.unsplash.com/photo-1608488055627-7c64c520db72?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                showFloating: true,
+                showVisualizer: true,
+                tickerSpeed: 30,
+                enableAdhan: true,
+                adhanUrlGeneral: 'https://ia801402.us.archive.org/16/items/Adhan_Makkah/Adhan_Makkah.mp3',
+                adhanUrlFajr: 'https://archive.org/download/Adhan_fajr_1/Adhan_fajr.mp3'
+            },
+            categories: [
+                { id: 'cat_1', name: 'تلاوات خاشعة', color: '#d4af37' },
+                { id: 'cat_2', name: 'المصحف المرتل', color: '#34a667' }
+            ],
+            tracks: [
+                { id: 'trk_1', title: 'سورة الملك - تلاوة هادئة', catId: 'cat_1', url: 'https://ia802909.us.archive.org/34/items/TvQuran.com__1/TvQuran.com__067.mp3', playCount: 5, dateAdded: Date.now() },
+                { id: 'trk_2', title: 'سورة الكهف - عبد الباسط', catId: 'cat_2', url: 'https://ia801306.us.archive.org/28/items/AbdulBasit_Mujawwad/018.mp3', playCount: 12, dateAdded: Date.now()-100000 }
+            ]
+        };
+
+        let appData = JSON.parse(localStorage.getItem('quran_pro_data_v4')) || DEFAULT_DATA;
+        let userFavorites = JSON.parse(localStorage.getItem('quran_user_favorites_v1')) || []; 
+        
+        if(appData.settings.adhanUrl && !appData.settings.adhanUrlGeneral) {
+            appData.settings.adhanUrlGeneral = appData.settings.adhanUrl;
+        }
+        if(!appData.settings.adhanUrlFajr) {
+            appData.settings.adhanUrlFajr = 'https://archive.org/download/Adhan_fajr_1/Adhan_fajr.mp3';
+        }
+
+        let currentTrackId = null;
+        let currentPlaylistContext = 'category'; 
+        let isPlaying = false;
+        let globalVisitorCount = '---';
+
+        const EN_AR_DICT = {
+            'al fatihah': 'الفاتحة', 'al baqarah': 'البقرة', 'baqarah': 'البقرة',
+            'aal e imran': 'آل عمران', 'al imran': 'آل عمران', 'an nisa': 'النساء',
+            'al maidah': 'المائدة', 'al an am': 'الأنعام', 'al araf': 'الأعراف',
+            'al anfal': 'الأنفال', 'at taubah': 'التوبة', 'yunus': 'يونس',
+            'hud': 'هود', 'yusuf': 'يوسف', 'ar rad': 'الرعد', 'ibrahim': 'إبراهيم',
+            'al hijr': 'الحجر', 'an nahl': 'النحل', 'al isra': 'الإسراء',
+            'al kahf': 'الكهف', 'maryam': 'مريم', 'ta ha': 'طه', 'taha': 'طه',
+            'al anbiya': 'الأنبياء', 'al hajj': 'الحج', 'al muminun': 'المؤمنون',
+            'an nur': 'النور', 'al furqan': 'الفرقان', 'ash shuara': 'الشعراء',
+            'an naml': 'النمل', 'al qasas': 'القصص', 'al ankabut': 'العنكبوت',
+            'ar rum': 'الروم', 'luqman': 'لقمان', 'as sajdah': 'السجدة',
+            'al ahzab': 'الأحزاب', 'saba': 'سبأ', 'fatir': 'فاطر', 'ya sin': 'يس', 'yasin': 'يس',
+            'as saffat': 'الصافات', 'sad': 'ص', 'az zumar': 'الزمر', 'ghafir': 'غافر',
+            'fussilat': 'فصلت', 'ash shura': 'الشورى', 'az zukhruf': 'الزخرف',
+            'ad dukhan': 'الدخان', 'al jathiyah': 'الجاثية', 'al ahqaf': 'الأحقاف',
+            'muhammad': 'محمد', 'al fath': 'الفتح', 'al hujurat': 'الحجرات',
+            'qaf': 'ق', 'ad dhariyat': 'الذاريات', 'at tur': 'الطور', 'an najm': 'النجم',
+            'al qamar': 'القمر', 'ar rahman': 'الرحمن', 'al waqiah': 'الواقعة',
+            'al hadid': 'الحديد', 'al mujadila': 'المجادلة', 'al hashr': 'الحشر',
+            'al mumtahanah': 'الممتحنة', 'as saff': 'الصف', 'al jumuah': 'الجمعة',
+            'al munafiqun': 'المنافقون', 'at taghabun': 'التغابن', 'at talaq': 'الطلاق',
+            'at tahrim': 'التحريم', 'al mulk': 'الملك', 'al qalam': 'القلم',
+            'al haqqah': 'الحاقة', 'al maarij': 'المعارج', 'nuh': 'نوح',
+            'al jinn': 'الجن', 'al muzzammil': 'المزمل', 'al muddaththir': 'المدثر',
+            'al qiyamah': 'القيامة', 'al insan': 'الإنسان', 'al mursalat': 'المرسلات',
+            'an naba': 'النبأ', 'an naziat': 'النازعات', 'abasa': 'عبس',
+            'at takwir': 'التكوير', 'al infitar': 'الانفطار', 'al mutaffifin': 'المطففين',
+            'al inshiqaq': 'الانشقاق', 'al buruj': 'البروج', 'at tariq': 'الطارق',
+            'al ala': 'الأعلى', 'al ghashiyah': 'الغاشية', 'al fajr': 'الفجر',
+            'al balad': 'البلد', 'ash shams': 'الشمس', 'al lail': 'الليل',
+            'ad duha': 'الضحى', 'ash sharh': 'الشرح', 'at tin': 'التين',
+            'al alaq': 'العلق', 'al qadr': 'القدر', 'al bayyinah': 'البينة',
+            'az zalzalah': 'الزلزلة', 'al adiyat': 'العاديات', 'al qariah': 'القارعة',
+            'at takathur': 'التكاثر', 'al asr': 'العصر', 'al humazah': 'الهمزة',
+            'al fil': 'الفيل', 'quraish': 'قريش', 'al maun': 'الماعون',
+            'al kawthar': 'الكوثر', 'al kafirun': 'الكافرون', 'an nasr': 'النصر',
+            'al masad': 'المسد', 'al ikhlas': 'الإخلاص', 'al falaq': 'الفلق', 'an nas': 'الناس',
+            'abdul basit': 'عبد الباسط', 'abdulbasit': 'عبد الباسط',
+            'alafasy': 'العفاسي', 'mishary': 'مشاري', 'sudais': 'السديس', 'shuraim': 'الشريم',
+            'surah': 'سورة', 'surat': 'سورة'
+        };
+
+        function saveData() {
+            localStorage.setItem('quran_pro_data_v4', JSON.stringify(appData));
+            updateStats();
+            if (window.firebaseSaveData) {
+                window.firebaseSaveData(appData);
+            }
+        }
+
+        window.updateAppDataFromFirebase = function(newData) {
+            if (newData) {
+                appData = newData;
+                localStorage.setItem('quran_pro_data_v4', JSON.stringify(appData));
+                applySettings();
+                updateStats();
+                
+                const searchInput = document.getElementById('search-input');
+                renderPlaylist(searchInput ? searchInput.value : '');
+                
+                const dashboardModal = document.getElementById('dashboard-modal');
+                if (dashboardModal && !dashboardModal.classList.contains('hidden')) {
+                    renderAdminCats();
+                    renderAdminTracks();
+                }
+            }
+        };
+
+        // ==========================================
+        // SMART MEDIA EXTRACTOR (TikTok Direct Resolution)
+        // ==========================================
+        async function resolveMediaUrl(originalUrl) {
+            if (!originalUrl) return '';
+            
+            if (originalUrl.includes('tiktok.com')) {
+                try {
+                    const reqUrl = originalUrl;
+                    const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(reqUrl)}`);
+                    const json = await res.json();
+                    
+                    if (json && json.data) {
+                        let mediaUrl = json.data.play || json.data.music; 
+                        if (mediaUrl) {
+                            if (mediaUrl.startsWith('//')) mediaUrl = 'https:' + mediaUrl;
+                            else if (mediaUrl.startsWith('/')) mediaUrl = 'https://www.tikwm.com' + mediaUrl;
+                            return mediaUrl;
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Failed to extract TikTok media", e);
+                }
+            }
+            return originalUrl;
+        }
+
+        // ==========================================
+        // 2. DUAL AUDIO ENGINE (Main vs Fallback)
+        // ==========================================
+        const mainAudioEl = document.getElementById('main-audio');
+        const fallbackAudioEl = document.getElementById('fallback-audio');
+        let activeAudio = mainAudioEl; // Pointer to whichever audio tag is active
+
+        function bindAudioEvents(audio) {
+            audio.addEventListener('play', (e) => { if(e.target === activeAudio) updatePlayState(); });
+            audio.addEventListener('pause', (e) => { if(e.target === activeAudio) updatePlayState(); });
+            audio.addEventListener('timeupdate', (e) => { 
+                if(e.target === activeAudio && activeAudio.duration) { 
+                    seekBar.value = (activeAudio.currentTime / activeAudio.duration) * 100; 
+                    curTimeEl.textContent = fmt(activeAudio.currentTime); 
+                } 
+            });
+            audio.addEventListener('loadedmetadata', (e) => { 
+                if(e.target === activeAudio) durEl.textContent = fmt(activeAudio.duration); 
+            });
+            audio.addEventListener('ended', (e) => {
+                if(e.target === activeAudio) handleTrackEnded();
+            });
+        }
+
+        bindAudioEvents(mainAudioEl);
+        bindAudioEvents(fallbackAudioEl);
+
+
+        // ==========================================
+        // 3. ADHAN SYSTEM (CAIRO TIMINGS)
+        // ==========================================
+        let prayerTimings = null;
+        let lastPlayedAdhan = null;
+        let resumeMainAudioAfterAdhan = false;
+        const adhanAudioEl = document.getElementById('adhan-audio');
+
+        async function fetchPrayerTimes() {
+            if(!appData.settings.enableAdhan) return;
+            try {
+                const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=Cairo&country=Egypt&method=5`);
+                const data = await res.json();
+                prayerTimings = data.data.timings;
+            } catch(e) {
+                console.error("Error fetching prayer times for Cairo", e);
+            }
+        }
+
+        function checkPrayerTimes() {
+            if(!appData.settings.enableAdhan || !prayerTimings) return;
+            const now = new Date();
+            const currentHHMM = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            
+            const adhanPrayers = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+            const arNames = {'Fajr':'الفجر', 'Dhuhr':'الظهر', 'Asr':'العصر', 'Maghrib':'المغرب', 'Isha':'العشاء'};
+            
+            for(let p of adhanPrayers) {
+                if(prayerTimings[p] === currentHHMM && lastPlayedAdhan !== currentHHMM) {
+                    lastPlayedAdhan = currentHHMM; 
+                    triggerAdhan(arNames[p]);
+                    break;
+                }
+            }
+        }
+
+        async function triggerAdhan(prayerName, forceUrl = null) {
+            resumeMainAudioAfterAdhan = !activeAudio.paused && currentTrackId !== null;
+            if(resumeMainAudioAfterAdhan) {
+                activeAudio.pause();
+            }
+
+            document.getElementById('adhan-prayer-name').textContent = prayerName;
+            document.getElementById('adhan-overlay').classList.remove('hidden');
+            document.getElementById('adhan-play-btn').classList.add('hidden');
+
+            let adhanUrl = forceUrl;
+            if (!adhanUrl) {
+                if (prayerName === 'الفجر') adhanUrl = appData.settings.adhanUrlFajr;
+                else adhanUrl = appData.settings.adhanUrlGeneral;
+            }
+            if(!adhanUrl) adhanUrl = 'https://ia801402.us.archive.org/16/items/Adhan_Makkah/Adhan_Makkah.mp3';
+
+            try {
+                const finalUrl = await resolveMediaUrl(adhanUrl);
+                adhanAudioEl.src = finalUrl;
+                await adhanAudioEl.play();
+            } catch (e) {
+                console.warn("Autoplay blocked by browser. User interaction needed.", e);
+                document.getElementById('adhan-play-btn').classList.remove('hidden');
+            }
+        }
+
+        window.testAdhan = function(prayerType) {
+            let testUrl = '';
+            if(prayerType === 'الفجر') testUrl = document.getElementById('setting-adhan-fajr').value || 'https://archive.org/download/Adhan_fajr_1/Adhan_fajr.mp3';
+            else testUrl = document.getElementById('setting-adhan-general').value || 'https://ia801402.us.archive.org/16/items/Adhan_Makkah/Adhan_Makkah.mp3';
+            
+            triggerAdhan(prayerType + ' (تجريبي)', testUrl);
+        }
+
+        window.forcePlayAdhan = function() {
+            adhanAudioEl.play();
+            document.getElementById('adhan-play-btn').classList.add('hidden');
+        }
+
+        function skipAdhan() {
+            adhanAudioEl.pause();
+            adhanAudioEl.currentTime = 0;
+            closeAdhanOverlay();
+        }
+
+        function closeAdhanOverlay() {
+            document.getElementById('adhan-overlay').classList.add('hidden');
+            document.getElementById('adhan-play-btn').classList.add('hidden');
+            if(resumeMainAudioAfterAdhan) {
+                activeAudio.play();
+                resumeMainAudioAfterAdhan = false;
+            }
+        }
+
+        adhanAudioEl.addEventListener('ended', closeAdhanOverlay);
+
+        fetchPrayerTimes();
+        setInterval(checkPrayerTimes, 30000); 
+        setInterval(fetchPrayerTimes, 24 * 60 * 60 * 1000);
+
+
+        // ==========================================
+        // 4. VISITOR COUNTER API
+        // ==========================================
+        async function updateVisitorCount() {
+            try {
+                const namespace = 'quran-player-rare-2026'; 
+                let isVisited = sessionStorage.getItem('has_visited');
+                let url = `https://api.counterapi.dev/v1/${namespace}/visits`;
+                if(!isVisited) { url += '/up'; sessionStorage.setItem('has_visited', 'true'); }
+                const res = await fetch(url);
+                const data = await res.json();
+                globalVisitorCount = data.count || '---';
+                updateStats();
+            } catch (err) {
+                globalVisitorCount = '---';
+                updateStats();
+            }
+        }
+
+        // ==========================================
+        // 5. CORE STATS & UI RENDER
+        // ==========================================
+        function updateStats() {
+            const tickerEl = document.getElementById('stats-ticker');
+            if(!tickerEl) return;
+            
+            let totalTracks = appData.tracks.length;
+            let topTrackHtml = '<span class="text-gray-500">لا يوجد مقاطع</span>';
+            let lastTrackHtml = '<span class="text-gray-500">لا يوجد مقاطع</span>';
+            
+            if(totalTracks > 0) {
+                const top = [...appData.tracks].sort((a,b) => (b.playCount || 0) - (a.playCount || 0))[0];
+                topTrackHtml = `<span onclick="playTrack('${top.id}', 'category')" class="cursor-pointer text-gold-400 hover:text-white font-bold underline decoration-gold-500/50 underline-offset-4 transition" title="تشغيل الآن">${top.title} <i class="fas fa-play-circle ml-1"></i></span>`;
+                
+                const latest = [...appData.tracks].sort((a,b) => (b.dateAdded || 0) - (a.dateAdded || 0))[0];
+                lastTrackHtml = `<span onclick="playTrack('${latest.id}', 'category')" class="cursor-pointer text-gold-400 hover:text-white font-bold underline decoration-gold-500/50 underline-offset-4 transition" title="تشغيل الآن">${latest.title} <i class="fas fa-play-circle ml-1"></i></span>`;
+            }
+
+            tickerEl.innerHTML = `
+                <div class="flex items-center gap-2"><i class="fas fa-headphones text-gold-600"></i> إجمالي المقاطع بالمكتبة: <b class="text-white">${totalTracks}</b></div>
+                <div class="flex items-center gap-2 text-gold-500">|</div>
+                <div class="flex items-center gap-2"><i class="fas fa-users text-gold-600"></i> الزوار الفعليين: <b class="text-white">${globalVisitorCount}</b></div>
+                <div class="flex items-center gap-2 text-gold-500">|</div>
+                <div class="flex items-center gap-2"><i class="fas fa-fire text-gold-600"></i> الأكثر استماعاً: ${topTrackHtml}</div>
+                <div class="flex items-center gap-2 text-gold-500">|</div>
+                <div class="flex items-center gap-2"><i class="fas fa-clock text-gold-600"></i> أحدث إضافة: ${lastTrackHtml}</div>
+            `;
+            
+            const speed = appData.settings.tickerSpeed || 30;
+            document.documentElement.style.setProperty('--ticker-speed', speed + 's');
+        }
+
+        function updatePlaylistUI() {
+            document.querySelectorAll('li[onclick^="playTrack"]').forEach(li => {
+                const match = li.getAttribute('onclick').match(/playTrack\('([^']+)',\s*'([^']+)'\)/);
+                if (!match) return;
+                
+                const tId = match[1];
+                const tContext = match[2];
+                const isCurrent = (currentTrackId === tId && currentPlaylistContext === tContext);
+                
+                if (isCurrent) {
+                    li.classList.remove('hover:bg-dark-700');
+                    li.classList.add('bg-dark-600/50');
+                    if (tContext === 'favorites') li.classList.add('border-r-2', 'border-rose-500');
+                } else {
+                    li.classList.add('hover:bg-dark-700');
+                    li.classList.remove('bg-dark-600/50', 'border-r-2', 'border-rose-500');
+                }
+                
+                const titleEl = li.querySelector('h4');
+                if (titleEl) {
+                    titleEl.classList.toggle('text-white', isCurrent);
+                    titleEl.classList.toggle('text-gray-300', !isCurrent);
+                }
+                
+                const iconEl = li.querySelector('div.w-10 i');
+                if (iconEl) {
+                    if (isCurrent && isPlaying) {
+                        iconEl.className = `fas fa-pause ${tContext === 'favorites' ? 'text-rose-500' : 'text-gold-500'}`;
+                    } else {
+                        iconEl.className = 'fas fa-play text-gray-400';
+                    }
+                }
+            });
+        }
+
+        function toggleFavorite(event, trackId) {
+            event.stopPropagation(); 
+            const index = userFavorites.indexOf(trackId);
+            if (index > -1) {
+                userFavorites.splice(index, 1);
+            } else {
+                userFavorites.push(trackId);
+            }
+            localStorage.setItem('quran_user_favorites_v1', JSON.stringify(userFavorites));
+            renderPlaylist(document.getElementById('search-input').value);
+        }
+
+        function moveFavorite(event, trackId, direction) {
+            event.stopPropagation();
+            const index = userFavorites.indexOf(trackId);
+            if (index > -1) {
+                if (direction === 'up' && index > 0) {
+                    [userFavorites[index - 1], userFavorites[index]] = [userFavorites[index], userFavorites[index - 1]];
+                } else if (direction === 'down' && index < userFavorites.length - 1) {
+                    [userFavorites[index + 1], userFavorites[index]] = [userFavorites[index], userFavorites[index + 1]];
+                }
+                localStorage.setItem('quran_user_favorites_v1', JSON.stringify(userFavorites));
+                renderPlaylist(document.getElementById('search-input').value);
+            }
+        }
+
+        function renderPlaylist(searchTerm = '') {
+            const container = document.getElementById('playlist-container');
+            const emptyState = document.getElementById('empty-state');
+            
+            const openAccordions = [];
+            document.querySelectorAll('.accordion-content.open').forEach(el => {
+                openAccordions.push(el.id);
+            });
+
+            if (appData.tracks.length === 0 && appData.categories.length === 0) {
+                container.innerHTML = ''; emptyState.classList.remove('hidden'); return;
+            }
+            emptyState.classList.add('hidden');
+
+            let html = '';
+
+            const favTracks = userFavorites.map(fid => appData.tracks.find(t => t.id === fid)).filter(t => t && t.title.toLowerCase().includes(searchTerm.toLowerCase()));
+            
+            if (searchTerm === '' || favTracks.length > 0) {
+                html += `
+                <div class="bg-dark-800 rounded-xl border border-rose-500/30 overflow-hidden mb-5 shadow-[0_0_15px_rgba(225,29,72,0.1)]">
+                    <button onclick="toggleAccordion('acc_favorites')" class="w-full px-4 py-4 flex justify-between items-center bg-gradient-to-l from-dark-700 to-dark-800 hover:from-dark-600 hover:to-dark-700 transition" style="border-right: 4px solid #e11d48">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-heart text-lg text-rose-600"></i>
+                            <span class="font-bold text-white text-lg">المفضلة الخاصة بك</span>
+                            <span class="bg-dark-900 text-rose-500 font-bold text-xs px-2 py-1 rounded-full">${favTracks.length}</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 transition-transform duration-300" id="icon_acc_favorites"></i>
+                    </button>
+                    <div id="acc_favorites" class="accordion-content">
+                        <ul class="divide-y divide-dark-600 max-h-[400px] overflow-y-auto custom-scroll p-2">
+                `;
+
+                if(favTracks.length === 0) {
+                    html += `<li class="p-4 text-center text-gray-500 text-sm"><i class="far fa-star text-2xl mb-2 block opacity-50"></i>لم تقم بإضافة أي مقاطع للمفضلة بعد</li>`;
+                }
+
+                favTracks.forEach((track, index) => {
+                    const isCurrent = currentTrackId === track.id && currentPlaylistContext === 'favorites';
+                    const activeClass = isCurrent ? 'bg-dark-600/50 border-r-2 border-rose-500' : 'hover:bg-dark-700';
+                    const iconClass = isCurrent && isPlaying ? 'fa-pause text-rose-500' : 'fa-play text-gray-400';
+
+                    html += `
+                    <li class="p-2 flex items-center justify-between transition rounded cursor-pointer ${activeClass}" onclick="playTrack('${track.id}', 'favorites')">
+                        <div class="flex items-center gap-3 flex-1 overflow-hidden">
+                            <div class="w-10 h-10 rounded-full bg-dark-900 border border-dark-500 flex items-center justify-center shrink-0 shadow-inner">
+                                <i class="fas ${iconClass}"></i>
+                            </div>
+                            <h4 class="font-bold text-sm md:text-base truncate ${isCurrent ? 'text-white' : 'text-gray-300'}">${track.title}</h4>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0 mr-2">
+                            <div class="flex flex-col gap-1 ml-2 border-l border-dark-600 pl-2">
+                                <button onclick="moveFavorite(event, '${track.id}', 'up')" class="text-gray-500 hover:text-white text-xs ${index === 0 ? 'invisible' : ''}" title="تحريك لأعلى"><i class="fas fa-chevron-up"></i></button>
+                                <button onclick="moveFavorite(event, '${track.id}', 'down')" class="text-gray-500 hover:text-white text-xs ${index === favTracks.length - 1 ? 'invisible' : ''}" title="تحريك لأسفل"><i class="fas fa-chevron-down"></i></button>
+                            </div>
+                            <button onclick="toggleFavorite(event, '${track.id}')" class="text-rose-600 hover:text-rose-500 p-2 transition" title="إزالة من المفضلة"><i class="fas fa-heart text-lg"></i></button>
+                        </div>
+                    </li>`;
+                });
+                html += `</ul></div></div>`;
+            }
+
+            appData.categories.forEach(cat => {
+                const catTracks = appData.tracks.filter(t => t.catId === cat.id && t.title.toLowerCase().includes(searchTerm.toLowerCase()));
+                if(searchTerm !== '' && catTracks.length === 0) return;
+
+                const cColor = cat.color || '#d4af37';
+                html += `
+                <div class="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden mb-3">
+                    <button onclick="toggleAccordion('acc_${cat.id}')" class="w-full px-4 py-4 flex justify-between items-center bg-dark-700 hover:bg-dark-600 transition" style="border-right: 4px solid ${cColor}">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-folder text-lg" style="color: ${cColor}"></i>
+                            <span class="font-bold text-white text-lg">${cat.name}</span>
+                            <span class="bg-dark-900 text-gray-400 text-xs px-2 py-1 rounded-full">${catTracks.length}</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 transition-transform duration-300" id="icon_acc_${cat.id}"></i>
+                    </button>
+                    <div id="acc_${cat.id}" class="accordion-content">
+                        <ul class="divide-y divide-dark-600 max-h-[400px] overflow-y-auto custom-scroll p-2">
+                `;
+
+                if(catTracks.length === 0) html += `<li class="p-3 text-center text-gray-500 text-sm">لا توجد مقاطع</li>`;
+
+                catTracks.forEach(track => {
+                    const isCurrent = currentTrackId === track.id && currentPlaylistContext === 'category';
+                    const activeClass = isCurrent ? 'bg-dark-600/50' : 'hover:bg-dark-700';
+                    const iconClass = isCurrent && isPlaying ? 'fa-pause text-gold-500' : 'fa-play text-gray-400';
+                    const tColor = isCurrent ? `color: ${cColor};` : '';
+                    
+                    const isFav = userFavorites.includes(track.id);
+
+                    html += `
+                    <li class="p-2 flex items-center justify-between transition rounded cursor-pointer ${activeClass}" onclick="playTrack('${track.id}', 'category')">
+                        <div class="flex items-center gap-3 flex-1 overflow-hidden">
+                            <div class="w-10 h-10 rounded-full bg-dark-900 border border-dark-500 flex items-center justify-center shrink-0 shadow-inner">
+                                <i class="fas ${iconClass}"></i>
+                            </div>
+                            <h4 class="font-bold text-sm md:text-base truncate ${isCurrent ? 'text-white' : 'text-gray-300'}" style="${tColor}">${track.title}</h4>
+                        </div>
+                        <div class="flex items-center gap-3 shrink-0 mr-2">
+                            <span class="text-xs text-gray-500 hidden md:inline"><i class="fas fa-headphones mr-1"></i>${track.playCount || 0}</span>
+                            <button onclick="toggleFavorite(event, '${track.id}')" class="text-gray-400 hover:text-rose-500 p-2 transition" title="إضافة للمفضلة">
+                                <i class="${isFav ? 'fas text-rose-600' : 'far'} fa-heart text-lg"></i>
+                            </button>
+                        </div>
+                    </li>`;
+                });
+                html += `</ul></div></div>`;
+            });
+
+            container.innerHTML = html;
+
+            if (searchTerm === '') {
+                openAccordions.forEach(id => {
+                    const el = document.getElementById(id);
+                    const icon = document.getElementById('icon_' + id);
+                    if (el) {
+                        el.classList.add('open');
+                        el.style.maxHeight = '2000px';
+                        if (icon) icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            } else {
+                document.querySelectorAll('.accordion-content').forEach(el => el.style.maxHeight = '2000px');
+                document.querySelectorAll('.fa-chevron-down').forEach(el => el.style.transform = 'rotate(180deg)');
+            }
+        }
+
+        function toggleAccordion(id) {
+            const el = document.getElementById(id); const icon = document.getElementById('icon_' + id);
+            if (el.classList.contains('open')) { el.classList.remove('open'); el.style.maxHeight = null; icon.style.transform = 'rotate(0deg)'; } 
+            else { el.classList.add('open'); el.style.maxHeight = el.scrollHeight + "px"; icon.style.transform = 'rotate(180deg)'; }
+        }
+
+        document.getElementById('search-input').addEventListener('input', (e) => renderPlaylist(e.target.value));
+
+        // ==========================================
+        // 6. STUDIO AUDIO EFFECTS API
+        // ==========================================
+        const canvas = document.getElementById('visualizer');
+        const canvasCtx = canvas.getContext('2d');
+        const playIcon = document.getElementById('play-icon');
+        const recordLogo = document.getElementById('record-logo');
+        
+        let audioCtx, sourceNode, pannerNode, analyserNode;
+        let eqFilter, waveShaper, delayNode, feedbackGain, delayOutGain;
+        let convolverNode, reverbGain, dryGain;
+        let isAudioCtxInitialized = false;
+
+        function makeDistortionCurve(amount) {
+            if (amount === 0) return null;
+            const k = typeof amount === 'number' ? amount : 50;
+            const n_samples = 44100;
+            const curve = new Float32Array(n_samples);
+            const deg = Math.PI / 180;
+            for (let i = 0; i < n_samples; ++i) {
+                const x = i * 2 / n_samples - 1;
+                curve[i] = (3 + k) * x * 20 * deg / (Math.PI + k * Math.abs(x));
+            }
+            return curve;
+        }
+
+        function createReverb(ctx) {
+            const duration = 3.5; const decay = 2.0; const sampleRate = ctx.sampleRate; const length = sampleRate * duration;
+            const imp = ctx.createBuffer(2, length, sampleRate);
+            for (let i = 0; i < length; i++) {
+                const n = i < length ? 1 - i / length : 0;
+                imp.getChannelData(0)[i] = (Math.random() * 2 - 1) * Math.pow(n, decay);
+                imp.getChannelData(1)[i] = (Math.random() * 2 - 1) * Math.pow(n, decay);
+            }
+            return imp;
+        }
+
+        function initAudioContext() {
+            if (isAudioCtxInitialized) return;
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+                // نربط الـ audio الأصلي فقط بالفلاتر. تيك توك يعمل على المباشر لتجنب كتم الصوت.
+                sourceNode = audioCtx.createMediaElementSource(mainAudioEl);
+                
+                eqFilter = audioCtx.createBiquadFilter(); eqFilter.type = 'allpass';
+                waveShaper = audioCtx.createWaveShaper(); waveShaper.oversample = '4x';
+                convolverNode = audioCtx.createConvolver(); convolverNode.buffer = createReverb(audioCtx);
+                reverbGain = audioCtx.createGain(); reverbGain.gain.value = 0;
+                delayNode = audioCtx.createDelay(); delayNode.delayTime.value = 0.4;
+                feedbackGain = audioCtx.createGain(); feedbackGain.gain.value = 0.3;
+                delayOutGain = audioCtx.createGain(); delayOutGain.gain.value = 0;
+                dryGain = audioCtx.createGain(); dryGain.gain.value = 1;
+                
+                pannerNode = audioCtx.createStereoPanner();
+                analyserNode = audioCtx.createAnalyser(); analyserNode.fftSize = 256; 
+
+                sourceNode.connect(eqFilter); eqFilter.connect(waveShaper);
+                waveShaper.connect(dryGain); waveShaper.connect(convolverNode); waveShaper.connect(delayNode);
+                
+                convolverNode.connect(reverbGain); reverbGain.connect(pannerNode);
+                delayNode.connect(feedbackGain); feedbackGain.connect(delayNode); delayNode.connect(delayOutGain); delayOutGain.connect(pannerNode);
+                dryGain.connect(pannerNode); pannerNode.connect(analyserNode); analyserNode.connect(audioCtx.destination);
+                
+                isAudioCtxInitialized = true; drawVisualizer(); applyAudioFX(); 
+            } catch (e) {
+                console.warn("CORS blocked Web Audio API.", e);
+            }
+        }
+
+        function applyAudioFX() {
+            if (!isAudioCtxInitialized) return;
+            const fx = document.getElementById('audio-fx-select').value;
+            
+            eqFilter.type = 'allpass'; eqFilter.gain.value = 0; waveShaper.curve = makeDistortionCurve(0);
+            reverbGain.gain.value = 0; delayOutGain.gain.value = 0; dryGain.gain.value = 1;
+
+            switch (fx) {
+                case 'clear': eqFilter.type = 'highshelf'; eqFilter.frequency.value = 3500; eqFilter.gain.value = 15; break;
+                case 'bass': eqFilter.type = 'lowshelf'; eqFilter.frequency.value = 150; eqFilter.gain.value = 18; break;
+                case 'radio': eqFilter.type = 'bandpass'; eqFilter.frequency.value = 1500; eqFilter.Q.value = 1.2; waveShaper.curve = makeDistortionCurve(10); break;
+                case 'vinyl': eqFilter.type = 'lowpass'; eqFilter.frequency.value = 2500; waveShaper.curve = makeDistortionCurve(60); dryGain.gain.value = 0.8; break;
+                case 'echo': delayOutGain.gain.value = 0.6; dryGain.gain.value = 0.7; break;
+                case 'mosque': reverbGain.gain.value = 1.2; delayOutGain.gain.value = 0.1; dryGain.gain.value = 0.5; break;
+            }
+        }
+
+        document.getElementById('audio-fx-select').addEventListener('change', () => { if (!isAudioCtxInitialized) initAudioContext(); applyAudioFX(); });
+
+        let dynamicPanInterval;
+        document.getElementById('stereo-select').addEventListener('change', (e) => {
+            const val = e.target.value; clearInterval(dynamicPanInterval);
+            if (!isAudioCtxInitialized) initAudioContext(); if (!pannerNode) return;
+            if (val === 'dynamic') { let angle = 0; dynamicPanInterval = setInterval(() => { angle += 0.05; pannerNode.pan.value = Math.sin(angle) * 0.8; }, 50); } 
+            else { pannerNode.pan.value = parseFloat(val); }
+        });
+
+        function drawVisualizer() {
+            if(!isAudioCtxInitialized) return;
+            requestAnimationFrame(drawVisualizer);
+            
+            const bufferLength = analyserNode.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            
+            // Visualizer only works for mainAudioEl which is connected to AnalyserNode
+            if (appData.settings.showVisualizer && !activeAudio.paused && activeAudio === mainAudioEl) analyserNode.getByteFrequencyData(dataArray);
+            else dataArray.fill(0);
+
+            canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+            if(!appData.settings.showVisualizer) return;
+
+            const centerY = canvas.height / 2;
+            const centerX = canvas.width / 2;
+            const usableBins = Math.floor(bufferLength * 0.5); 
+            const barWidth = centerX / usableBins; 
+
+            for (let i = 0; i < usableBins; i++) {
+                let value = dataArray[i];
+                let barHeight = (value / 255) * (canvas.height * 0.8);
+                if(barHeight < 2) barHeight = 2;
+
+                let gradient = canvasCtx.createLinearGradient(0, centerY - barHeight/2, 0, centerY + barHeight/2);
+                gradient.addColorStop(0, 'rgba(212, 175, 55, 0.05)'); 
+                gradient.addColorStop(0.5, 'rgba(212, 175, 55, 1)'); 
+                gradient.addColorStop(1, 'rgba(212, 175, 55, 0.05)');
+
+                canvasCtx.fillStyle = gradient;
+                
+                let actualBarWidth = Math.max(1, barWidth - 1);
+                let xRight = centerX + (i * barWidth);
+                let xLeft = centerX - (i * barWidth) - actualBarWidth;
+
+                if (canvasCtx.roundRect) {
+                    canvasCtx.beginPath();
+                    canvasCtx.roundRect(xRight, centerY - barHeight/2, actualBarWidth, barHeight, 2);
+                    canvasCtx.roundRect(xLeft, centerY - barHeight/2, actualBarWidth, barHeight, 2);
+                    canvasCtx.fill();
+                } else {
+                    canvasCtx.fillRect(xRight, centerY - barHeight/2, actualBarWidth, barHeight);
+                    canvasCtx.fillRect(xLeft, centerY - barHeight/2, actualBarWidth, barHeight);
+                }
+            }
+        }
+
+        // --- Player Functions (Direct/Fallback routing included) ---
+        async function playTrack(id, context = 'category') {
+            const track = appData.tracks.find(t => t.id === id);
+            if(!track) return;
+            
+            if (currentTrackId === id && currentPlaylistContext === context) {
+                if(isPlaying) activeAudio.pause();
+                else { initAudioContext(); activeAudio.play(); }
+                return;
+            }
+
+            if(!document.getElementById('adhan-overlay').classList.contains('hidden')) {
+                skipAdhan();
+            }
+
+            currentTrackId = track.id;
+            currentPlaylistContext = context;
+            
+            document.getElementById('now-playing-title').textContent = "جاري جلب المقطع...";
+            updatePlaylistUI(); 
+
+            try {
+                // إيقاف أي مشغل حالي تماماً
+                activeAudio.pause();
+                activeAudio.currentTime = 0;
+
+                const isTikTok = track.url.includes('tiktok.com');
+                
+                // التحويل للمسار المباشر (لحل مشكلة كتم الصوت مع روابط تيك توك)
+                if (isTikTok) {
+                    activeAudio = fallbackAudioEl;
+                } else {
+                    activeAudio = mainAudioEl;
+                }
+                
+                const finalUrl = await resolveMediaUrl(track.url);
+                activeAudio.src = finalUrl;
+                document.getElementById('now-playing-title').textContent = track.title;
+                
+                if (context === 'favorites') {
+                    document.getElementById('now-playing-category').textContent = "قائمة المفضلة";
+                    document.getElementById('now-playing-category').style.borderColor = '#e11d48'; 
+                    document.getElementById('now-playing-category').style.color = '#e11d48';
+                } else {
+                    const cat = appData.categories.find(c => c.id === track.catId);
+                    document.getElementById('now-playing-category').textContent = cat ? cat.name : 'عام';
+                    document.getElementById('now-playing-category').style.borderColor = cat ? cat.color : '#555';
+                    document.getElementById('now-playing-category').style.color = cat ? cat.color : '#ccc';
+                }
+
+                track.playCount = (track.playCount || 0) + 1;
+                saveData();
+                
+                initAudioContext();
+                await activeAudio.play();
+            } catch (e) {
+                console.error("Playback error:", e);
+                alert("عذراً، تعذر تشغيل الرابط. قد يكون المصدر محذوفاً.");
+                document.getElementById('now-playing-title').textContent = "خطأ في التشغيل";
+            }
+            updatePlaylistUI();
+        }
+
+        document.getElementById('btn-play-pause').addEventListener('click', () => {
+            if(!currentTrackId && appData.tracks.length > 0) playTrack(appData.tracks[0].id, 'category');
+            else if(currentTrackId) { initAudioContext(); activeAudio.paused ? activeAudio.play() : activeAudio.pause(); }
+        });
+
+        function updatePlayState() {
+            isPlaying = !activeAudio.paused;
+            playIcon.className = isPlaying ? 'fas fa-pause text-3xl ml-1' : 'fas fa-play text-3xl ml-1';
+            isPlaying ? recordLogo.classList.remove('pause-animation') : recordLogo.classList.add('pause-animation');
+            updatePlaylistUI(); 
+        }
+
+        function handleTrackEnded() { 
+            updatePlayState(); 
+            activeAudio.currentTime = 0; 
+            
+            if (currentTrackId) {
+                let currentList = [];
+                const currentTrack = appData.tracks.find(t => t.id === currentTrackId);
+                
+                if (currentPlaylistContext === 'favorites') {
+                    currentList = userFavorites.map(fid => appData.tracks.find(t => t.id === fid)).filter(t => t);
+                } else if (currentTrack) {
+                    currentList = appData.tracks.filter(t => t.catId === currentTrack.catId);
+                }
+
+                if (currentList.length > 0) {
+                    const currentIndex = currentList.findIndex(t => t.id === currentTrackId);
+                    if (currentIndex > -1) {
+                        let nextIndex = currentIndex + 1;
+                        if (nextIndex >= currentList.length) nextIndex = 0; 
+                        const nextTrack = currentList[nextIndex];
+                        if (nextTrack) {
+                            playTrack(nextTrack.id, currentPlaylistContext);
+                        }
+                    }
+                }
+            }
+        }
+        
+        const seekBar = document.getElementById('seek-bar'), curTimeEl = document.getElementById('current-time'), durEl = document.getElementById('duration');
+        function fmt(s) { const m=Math.floor(s/60); const sc=Math.floor(s%60); return `${m.toString().padStart(2,'0')}:${sc.toString().padStart(2,'0')}`; }
+        
+        seekBar.addEventListener('input', (e) => { if (activeAudio.duration) activeAudio.currentTime = activeAudio.duration * (e.target.value / 100); });
+        
+        document.getElementById('volume-slider').addEventListener('input', (e) => {
+            mainAudioEl.volume = e.target.value;
+            fallbackAudioEl.volume = e.target.value;
+        });
+        
+        document.getElementById('btn-forward').addEventListener('click', () => { if(activeAudio.duration) activeAudio.currentTime = Math.min(activeAudio.currentTime + 10, activeAudio.duration); });
+        document.getElementById('btn-backward').addEventListener('click', () => { if(activeAudio.duration) activeAudio.currentTime = Math.max(activeAudio.currentTime - 10, 0); });
+
+
+        // ==========================================
+        // 7. DASHBOARD & FORMS
+        // ==========================================
+        function openDashboardLogin() { document.getElementById('login-modal').classList.remove('hidden'); document.getElementById('admin-password').value=''; document.getElementById('admin-password').focus(); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        
+        function checkPassword() {
+            if(document.getElementById('admin-password').value === '2112') {
+                closeModal('login-modal'); document.getElementById('dashboard-modal').classList.remove('hidden'); initDashboard();
+            } else { alert("كلمة المرور خاطئة!"); }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.dash-tab').forEach(el => { el.classList.remove('active', 'text-gold-500', 'font-bold'); el.classList.add('text-gray-400'); });
+            document.getElementById(tabId).classList.remove('hidden');
+            event.currentTarget.classList.remove('text-gray-400'); event.currentTarget.classList.add('text-gold-500', 'font-bold', 'active');
+        }
+
+        function initDashboard() {
+            document.getElementById('setting-logo').value = appData.settings.logoUrl;
+            document.getElementById('setting-floating').checked = appData.settings.showFloating;
+            document.getElementById('setting-visualizer').checked = appData.settings.showVisualizer;
+            document.getElementById('setting-adhan-enable').checked = appData.settings.enableAdhan !== false;
+            
+            document.getElementById('setting-adhan-fajr').value = appData.settings.adhanUrlFajr || '';
+            document.getElementById('setting-adhan-general').value = appData.settings.adhanUrlGeneral || '';
+            
+            if(document.getElementById('setting-ticker-speed')) { document.getElementById('setting-ticker-speed').value = appData.settings.tickerSpeed || 30; document.getElementById('ticker-speed-val').textContent = (appData.settings.tickerSpeed || 30) + 's'; }
+            populateCatSelects(); renderAdminCats(); renderAdminTracks();
+        }
+
+        function saveSettings() {
+            appData.settings.logoUrl = document.getElementById('setting-logo').value;
+            appData.settings.showFloating = document.getElementById('setting-floating').checked;
+            appData.settings.showVisualizer = document.getElementById('setting-visualizer').checked;
+            appData.settings.enableAdhan = document.getElementById('setting-adhan-enable').checked;
+            appData.settings.adhanUrlFajr = document.getElementById('setting-adhan-fajr').value;
+            appData.settings.adhanUrlGeneral = document.getElementById('setting-adhan-general').value;
+            if(document.getElementById('setting-ticker-speed')) appData.settings.tickerSpeed = parseInt(document.getElementById('setting-ticker-speed').value);
+            
+            saveData(); applySettings(); updateStats(); 
+            if(appData.settings.enableAdhan) fetchPrayerTimes();
+            alert('تم حفظ الإعدادات!');
+        }
+
+        function applySettings() {
+            document.getElementById('logo-img').src = appData.settings.logoUrl;
+            appData.settings.showFloating ? startFloating() : stopFloating();
+            if(!appData.settings.showVisualizer) canvasCtx.clearRect(0,0,canvas.width, canvas.height);
+        }
+
+        function renderAdminCats() {
+            document.getElementById('admin-cats-list').innerHTML = appData.categories.map((c, index) => `
+                <div class="bg-dark-800 p-3 rounded border border-dark-600 flex justify-between items-center" style="border-right: 4px solid ${c.color}">
+                    <span class="text-white font-bold">${c.name}</span>
+                    <div class="gap-2 flex items-center">
+                        <button onclick="moveCategory(${index}, -1)" class="text-gray-400 hover:text-white px-1" title="تحريك لأعلى"><i class="fas fa-arrow-up"></i></button>
+                        <button onclick="moveCategory(${index}, 1)" class="text-gray-400 hover:text-white px-1 border-l border-dark-600 pl-2" title="تحريك لأسفل"><i class="fas fa-arrow-down"></i></button>
+                        <button onclick="editCat('${c.id}')" class="text-blue-400 hover:text-blue-300 px-2" title="تعديل"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteCat('${c.id}')" class="text-red-400 hover:text-red-300 px-2" title="حذف"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`).join('');
+            populateCatSelects();
+        }
+
+        function moveCategory(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= appData.categories.length) return;
+            const temp = appData.categories[index];
+            appData.categories[index] = appData.categories[newIndex];
+            appData.categories[newIndex] = temp;
+            
+            saveData();
+            renderAdminCats();
+            renderPlaylist();
+        }
+
+        document.getElementById('cat-form').addEventListener('submit', (e) => {
+            e.preventDefault(); const id = document.getElementById('cat-id').value, name = document.getElementById('cat-name').value, color = document.getElementById('cat-color').value;
+            if(id) { const idx = appData.categories.findIndex(c => c.id === id); if(idx > -1) appData.categories[idx] = {id, name, color}; } 
+            else { appData.categories.push({ id: 'cat_' + Date.now(), name, color }); }
+            saveData(); renderAdminCats(); resetCatForm(); renderPlaylist();
+        });
+        function editCat(id) { const c = appData.categories.find(c => c.id === id); if(c) { document.getElementById('cat-id').value = c.id; document.getElementById('cat-name').value = c.name; document.getElementById('cat-color').value = c.color; document.getElementById('cat-submit').textContent = 'تعديل'; document.getElementById('cat-cancel').classList.remove('hidden'); } }
+        function deleteCat(id) { if(confirm('سيتم الحذف؟')) { appData.categories = appData.categories.filter(c => c.id !== id); saveData(); renderAdminCats(); renderPlaylist(); } }
+        function resetCatForm() { document.getElementById('cat-id').value = ''; document.getElementById('cat-name').value = ''; document.getElementById('cat-color').value = '#d4af37'; document.getElementById('cat-submit').textContent = 'إضافة'; document.getElementById('cat-cancel').classList.add('hidden'); }
+        function populateCatSelects() {
+            const opts = appData.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            document.getElementById('trk-cat').innerHTML = opts; document.getElementById('import-cat').innerHTML = opts; document.getElementById('bulk-cat').innerHTML = opts;
+        }
+
+        function autoCleanName(str) {
+            let clean = decodeURIComponent(str.split('/').pop().split('?')[0]).replace(/\.(mp3|wav|m4a|ogg)$/i, '').replace(/tvquran\.com/gi, ' ').replace(/128kbps/gi, ' ').replace(/64kbps/gi, ' ').replace(/_+/g, ' ').replace(/-+/g, ' ').replace(/^\d+\s*/, '');
+            clean = clean.replace(/\s+/g, ' ').trim() || "تلاوة جديدة";
+            for (const [en, ar] of Object.entries(EN_AR_DICT)) clean = clean.replace(new RegExp('\\b' + en + '\\b', 'gi'), ar);
+            return clean;
+        }
+        
+        async function autoExtractName(url) { 
+            const nameInput = document.getElementById('trk-name');
+            if (url.includes('tiktok.com') && !nameInput.value) {
+                nameInput.placeholder = "جاري جلب الاسم من تيك توك...";
+                try {
+                    const cleanUrl = url;
+                    const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(cleanUrl)}`);
+                    const json = await res.json();
+                    if (json && json.data && json.data.title) {
+                        nameInput.value = autoCleanName(json.data.title);
+                        nameInput.placeholder = "اسم التلاوة";
+                        return;
+                    }
+                } catch(e) {}
+                nameInput.placeholder = "اسم التلاوة";
+            }
+            if(!nameInput.value && !url.includes('tiktok.com')) nameInput.value = autoCleanName(url); 
+        }
+
+        document.getElementById('track-form').addEventListener('submit', (e) => {
+            e.preventDefault(); const id = document.getElementById('trk-id').value, title = document.getElementById('trk-name').value, url = document.getElementById('trk-url').value, catId = document.getElementById('trk-cat').value;
+            if(id) { const idx = appData.tracks.findIndex(t => t.id === id); if(idx > -1) { appData.tracks[idx].title = title; appData.tracks[idx].url = url; appData.tracks[idx].catId = catId; } } 
+            else { appData.tracks.unshift({ id: 'trk_' + Date.now(), title, url, catId, playCount: 0, dateAdded: Date.now() }); }
+            saveData(); renderAdminTracks(); resetTrackForm(); renderPlaylist();
+        });
+
+        let currentlyDisplayedAdminTracks = []; 
+        function renderAdminTracks() {
+            const q = document.getElementById('admin-search-track').value.toLowerCase();
+            const list = document.getElementById('admin-tracks-list');
+            currentlyDisplayedAdminTracks = appData.tracks.filter(t => t.title.toLowerCase().includes(q) || t.url.includes(q)).slice(0, 200);
+            
+            list.innerHTML = currentlyDisplayedAdminTracks.map(t => {
+                const cName = appData.categories.find(c => c.id === t.catId)?.name || 'غير محدد';
+                return `
+                <tr class="hover:bg-dark-700 transition">
+                    <td class="px-3 py-2 text-center border-r border-dark-600"><input type="checkbox" class="track-checkbox custom-checkbox" value="${t.id}" onchange="updateBulkUI()"></td>
+                    <td class="px-4 py-2 text-white font-bold truncate max-w-[200px] cursor-pointer hover:text-gold-400" title="${t.url}" onclick="editAdminTrack('${t.id}')">${t.title}</td>
+                    <td class="px-4 py-2 text-gray-400">${cName}</td>
+                    <td class="px-4 py-2 text-center">
+                        <button onclick="deleteAdminTrack('${t.id}')" class="text-red-400 hover:text-red-300 bg-dark-800 px-2 py-1 rounded" title="حذف فردي"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
+            }).join('');
+            document.getElementById('check-all').checked = false; updateBulkUI();
+        }
+
+        function toggleAllTracks(source) {
+            document.querySelectorAll('.track-checkbox').forEach(cb => cb.checked = source.checked); updateBulkUI();
+        }
+
+        function updateBulkUI() {
+            const count = document.querySelectorAll('.track-checkbox:checked').length;
+            if(count > 0) {
+                document.getElementById('bulk-toolbar').classList.remove('hidden');
+                document.getElementById('selected-count').classList.remove('hidden');
+                document.getElementById('selected-count').textContent = `محدد: ${count}`;
+            } else {
+                document.getElementById('bulk-toolbar').classList.add('hidden');
+                document.getElementById('selected-count').classList.add('hidden');
+            }
+        }
+
+        function getSelectedTrackIds() { return Array.from(document.querySelectorAll('.track-checkbox:checked')).map(cb => cb.value); }
+
+        function bulkDelete() {
+            const ids = getSelectedTrackIds(); if(ids.length === 0) return;
+            if(confirm(`هل أنت متأكد من حذف ${ids.length} مقطع دفعة واحدة؟`)) {
+                appData.tracks = appData.tracks.filter(t => !ids.includes(t.id)); saveData(); renderAdminTracks(); renderPlaylist();
+            }
+        }
+
+        function bulkChangeCategory() {
+            const ids = getSelectedTrackIds(), newCatId = document.getElementById('bulk-cat').value;
+            if(ids.length === 0 || !newCatId) return;
+            ids.forEach(id => { const trk = appData.tracks.find(t => t.id === id); if(trk) trk.catId = newCatId; });
+            saveData(); renderAdminTracks(); renderPlaylist(); alert('تم نقل المقاطع بنجاح');
+        }
+
+        function bulkRename() {
+            const ids = getSelectedTrackIds(), baseName = document.getElementById('bulk-rename-base').value.trim();
+            if(ids.length === 0 || !baseName) return alert('الرجاء تحديد مقاطع وكتابة اسم أساسي');
+            let counter = 1;
+            ids.forEach(id => { const trk = appData.tracks.find(t => t.id === id); if(trk) { trk.title = `${baseName} ${counter}`; counter++; } });
+            saveData(); renderAdminTracks(); renderPlaylist(); document.getElementById('bulk-rename-base').value = '';
+        }
+
+        function editAdminTrack(id) { const t = appData.tracks.find(t => t.id === id); if(t) { document.getElementById('trk-id').value = t.id; document.getElementById('trk-name').value = t.title; document.getElementById('trk-url').value = t.url; document.getElementById('trk-cat').value = t.catId; document.getElementById('trk-submit').innerHTML = '<i class="fas fa-save"></i> تحديث'; document.getElementById('trk-cancel').classList.remove('hidden'); } }
+        function deleteAdminTrack(id) { if(confirm('حذف؟')) { appData.tracks = appData.tracks.filter(t => t.id !== id); saveData(); renderAdminTracks(); renderPlaylist(); } }
+        function resetTrackForm() { document.getElementById('trk-id').value = ''; document.getElementById('trk-name').value = ''; document.getElementById('trk-url').value = ''; document.getElementById('trk-submit').innerHTML = '<i class="fas fa-plus"></i>'; document.getElementById('trk-cancel').classList.add('hidden'); }
+
+        async function startBulkImport() {
+            const urlInput = document.getElementById('import-url').value.trim();
+            const catId = document.getElementById('import-cat').value;
+            const baseName = document.getElementById('import-base-name').value.trim();
+            if(!urlInput || !catId) return alert('الرجاء إدخال الرابط واختيار القسم');
+
+            const match = urlInput.match(/details\/([^\/\?]+)/);
+            if(!match) return alert('الرابط غير صحيح. يجب أن يحتوي على details/identifier');
+            
+            const identifier = match[1];
+            const statusDiv = document.getElementById('import-status'), msgEl = document.getElementById('import-msg'), progEl = document.getElementById('import-progress'), btn = document.getElementById('btn-import');
+            
+            statusDiv.classList.remove('hidden'); btn.disabled = true; btn.classList.add('opacity-50'); progEl.style.width = '10%';
+            
+            try {
+                const res = await fetch(`https://archive.org/metadata/${identifier}`);
+                const data = await res.json();
+                if(!data.files || data.files.length === 0) throw new Error('لا توجد ملفات في الأرشيف');
+                progEl.style.width = '50%'; msgEl.textContent = 'جاري استخراج وتحليل المقاطع الصوتية...';
+                
+                const mp3Files = data.files.filter(f => f.name.toLowerCase().endsWith('.mp3')).sort((a,b) => a.name.localeCompare(b.name));
+                if(mp3Files.length === 0) throw new Error('لم يتم العثور على ملفات MP3');
+
+                let added = 0;
+                mp3Files.forEach((f, index) => {
+                    let title = baseName ? `${baseName} ${index + 1}` : (f.title ? autoCleanName(f.title) : autoCleanName(f.name));
+                    const fileUrl = `https://archive.org/download/${identifier}/${f.name}`;
+                    if(!appData.tracks.find(t => t.url === fileUrl)) {
+                        appData.tracks.push({ id: 'trk_' + Date.now() + Math.floor(Math.random()*1000), title: title, url: fileUrl, catId: catId, playCount: 0, dateAdded: Date.now() }); added++;
+                    }
+                });
+
+                progEl.style.width = '100%'; msgEl.textContent = `نجاح! تمت إضافة ${added} مقطع جديد.`; msgEl.classList.replace('text-white', 'text-green-400');
+                saveData(); renderAdminTracks(); renderPlaylist();
+                
+                setTimeout(() => {
+                    statusDiv.classList.add('hidden'); msgEl.classList.replace('text-green-400', 'text-white'); btn.disabled = false; btn.classList.remove('opacity-50');
+                    document.getElementById('import-url').value = ''; document.getElementById('import-base-name').value = '';
+                }, 4000);
+
+            } catch (err) {
+                msgEl.textContent = err.message || 'خطأ أثناء الاتصال بالأرشيف.'; msgEl.classList.replace('text-white', 'text-red-400'); btn.disabled = false; btn.classList.remove('opacity-50');
+            }
+        }
+
+        // ==========================================
+        // 8. BACKGROUND EFFECTS
+        // ==========================================
+        const floatBg = document.getElementById('floating-bg');
+        const chars = ['﷽', 'الله', 'محمد', 'ق', 'ن', 'يس', 'طه', '۩', '۝', 'ص'];
+        let floatInt;
+        function spawnChar() {
+            const sp = document.createElement('span'); sp.className = 'floating-letter text-2xl md:text-5xl';
+            sp.textContent = chars[Math.floor(Math.random() * chars.length)];
+            sp.style.left = Math.random() * 100 + 'vw'; sp.style.animationDuration = (Math.random() * 15 + 15) + 's';
+            floatBg.appendChild(sp); setTimeout(() => sp.remove(), 30000);
+        }
+        function startFloating() { clearInterval(floatInt); floatBg.innerHTML=''; floatInt = setInterval(spawnChar, 2000); }
+        function stopFloating() { clearInterval(floatInt); floatBg.innerHTML=''; }
+
+        // ==========================================
+        // INIT APP
+        // ==========================================
+        applySettings();
+        updateStats();
+        updateVisitorCount();
+        renderPlaylist();
+
+    </script>
+</body>
+</html>
