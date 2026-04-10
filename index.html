@@ -139,7 +139,7 @@
                     <span class="text-sm md:text-base hidden sm:inline">المصحف المقروء</span>
                 </a>
 
-                <button onclick="openDashboardLogin()" class="bg-dark-700 hover:bg-dark-600 text-gold-500 p-3 rounded-full transition shadow-lg border border-gold-500/30 group shrink-0" title="لوحة التحكم">
+                <button onclick="window.openDashboardLogin()" class="bg-dark-700 hover:bg-dark-600 text-gold-500 p-3 rounded-full transition shadow-lg border border-gold-500/30 group shrink-0" title="لوحة التحكم">
                     <i class="fas fa-shield-alt text-xl group-hover:scale-110 transition-transform"></i>
                 </button>
             </div>
@@ -315,10 +315,10 @@
             <img id="intro-logo" src="" class="w-full h-full object-cover" alt="شعار المنصة">
         </div>
         <h2 class="text-4xl md:text-5xl font-serif font-bold text-gold-400 mb-10 tracking-widest text-center leading-relaxed">بِسْمِ اللَّـهِ الرَّحْمَـٰنِ الرَّحِيمِ</h2>
-        <button onclick="playIntroAndEnter()" class="bg-gradient-to-r from-gold-600 to-gold-400 text-dark-900 px-10 py-4 rounded-full font-bold shadow-[0_0_20px_rgba(212,175,55,0.4)] hover:scale-105 transition-transform text-lg flex items-center gap-3">
+        <button onclick="window.playIntroAndEnter()" class="bg-gradient-to-r from-gold-600 to-gold-400 text-dark-900 px-10 py-4 rounded-full font-bold shadow-[0_0_20px_rgba(212,175,55,0.4)] hover:scale-105 transition-transform text-lg flex items-center gap-3">
             <i class="fas fa-play"></i> اضغط للدخول والاستماع
         </button>
-        <button onclick="skipIntroAndEnter()" class="mt-6 text-gray-400 hover:text-white underline text-sm transition-colors">الدخول بدون تتر البداية</button>
+        <button onclick="window.skipIntroAndEnter()" class="mt-6 text-gray-400 hover:text-white underline text-sm transition-colors">الدخول بدون تتر البداية</button>
     </div>
 
     <!-- Adhan Overlay -->
@@ -330,10 +330,10 @@
             <p class="text-gray-400 text-lg mb-8">حسب التوقيت المحلي لمدينة القاهرة</p>
             
             <div class="flex flex-col items-center gap-4 relative z-10">
-                <button id="adhan-play-btn" onclick="forcePlayAdhan()" class="hidden bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold px-6 py-2 rounded-full transition text-sm mb-2 shadow-lg">
+                <button id="adhan-play-btn" onclick="window.forcePlayAdhan()" class="hidden bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold px-6 py-2 rounded-full transition text-sm mb-2 shadow-lg">
                     <i class="fas fa-volume-up mr-1"></i> تشغيل صوت الأذان
                 </button>
-                <button onclick="skipAdhan()" class="bg-dark-700 hover:bg-dark-600 border border-dark-500 text-gray-300 px-6 py-2 rounded-full transition text-sm">
+                <button onclick="window.skipAdhan()" class="bg-dark-700 hover:bg-dark-600 border border-dark-500 text-gray-300 px-6 py-2 rounded-full transition text-sm">
                     <i class="fas fa-times mr-1"></i> تخطي وإغلاق
                 </button>
             </div>
@@ -345,10 +345,10 @@
         <div class="bg-dark-800 border border-gold-500/30 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl">
             <i class="fas fa-lock text-4xl text-gold-500 mb-4"></i>
             <h2 class="text-2xl font-bold text-white mb-6">حماية لوحة التحكم</h2>
-            <input type="password" id="admin-password" placeholder="كلمة المرور" class="w-full bg-dark-900 border border-dark-600 rounded-lg px-4 py-3 text-center text-white mb-4 focus:outline-none focus:border-gold-500" onkeypress="if(event.key==='Enter') checkPassword()">
+            <input type="password" id="admin-password" placeholder="كلمة المرور" class="w-full bg-dark-900 border border-dark-600 rounded-lg px-4 py-3 text-center text-white mb-4 focus:outline-none focus:border-gold-500" onkeypress="if(event.key==='Enter') window.checkPassword()">
             <div class="flex gap-2">
-                <button onclick="checkPassword()" class="flex-1 bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold py-2 rounded-lg transition">دخول</button>
-                <button onclick="closeModal('login-modal')" class="flex-1 bg-dark-700 hover:bg-dark-600 text-white font-bold py-2 rounded-lg transition">إلغاء</button>
+                <button onclick="window.checkPassword()" class="flex-1 bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold py-2 rounded-lg transition">دخول</button>
+                <button onclick="window.closeModal('login-modal')" class="flex-1 bg-dark-700 hover:bg-dark-600 text-white font-bold py-2 rounded-lg transition">إلغاء</button>
             </div>
         </div>
     </div>
@@ -360,16 +360,16 @@
             <!-- Dashboard Header -->
             <div class="bg-dark-900 border-b border-dark-600 p-4 flex justify-between items-center shrink-0">
                 <h2 class="text-2xl font-serif font-bold text-gold-500"><i class="fas fa-sliders-h ml-2"></i>لوحة التحكم الاحترافية</h2>
-                <button onclick="closeModal('dashboard-modal')" class="text-gray-400 hover:text-red-500 transition"><i class="fas fa-times text-2xl"></i></button>
+                <button onclick="window.closeModal('dashboard-modal')" class="text-gray-400 hover:text-red-500 transition"><i class="fas fa-times text-2xl"></i></button>
             </div>
 
             <div class="flex flex-1 overflow-hidden">
                 <!-- Sidebar Tabs -->
                 <div class="w-56 bg-dark-900 border-l border-dark-600 flex flex-col shrink-0 text-sm">
-                    <button class="dash-tab active p-4 text-right border-b border-dark-700 text-gold-500 font-bold hover:bg-dark-800 transition" onclick="switchTab('tab-settings')"><i class="fas fa-cog w-5 text-center"></i> الإعدادات</button>
-                    <button class="dash-tab p-4 text-right border-b border-dark-700 text-gray-400 hover:text-gold-500 hover:bg-dark-800 transition" onclick="switchTab('tab-categories')"><i class="fas fa-tags w-5 text-center"></i> إدارة الأقسام</button>
-                    <button class="dash-tab p-4 text-right border-b border-dark-700 text-gray-400 hover:text-gold-500 hover:bg-dark-800 transition" onclick="switchTab('tab-tracks')"><i class="fas fa-music w-5 text-center"></i> إدارة المقاطع</button>
-                    <button class="dash-tab p-4 text-right border-b border-dark-700 text-gray-400 hover:text-gold-500 hover:bg-dark-800 transition" onclick="switchTab('tab-import')"><i class="fas fa-cloud-download-alt w-5 text-center"></i> استيراد من أرشيف</button>
+                    <button class="dash-tab active p-4 text-right border-b border-dark-700 text-gold-500 font-bold hover:bg-dark-800 transition" onclick="window.switchTab('tab-settings')"><i class="fas fa-cog w-5 text-center"></i> الإعدادات</button>
+                    <button class="dash-tab p-4 text-right border-b border-dark-700 text-gray-400 hover:text-gold-500 hover:bg-dark-800 transition" onclick="window.switchTab('tab-categories')"><i class="fas fa-tags w-5 text-center"></i> إدارة الأقسام</button>
+                    <button class="dash-tab p-4 text-right border-b border-dark-700 text-gray-400 hover:text-gold-500 hover:bg-dark-800 transition" onclick="window.switchTab('tab-tracks')"><i class="fas fa-music w-5 text-center"></i> إدارة المقاطع</button>
+                    <button class="dash-tab p-4 text-right border-b border-dark-700 text-gray-400 hover:text-gold-500 hover:bg-dark-800 transition" onclick="window.switchTab('tab-import')"><i class="fas fa-cloud-download-alt w-5 text-center"></i> استيراد من أرشيف</button>
                 </div>
 
                 <!-- Content Area -->
@@ -391,7 +391,7 @@
                                 <label class="block text-xs text-gray-400 mb-2">ضع رابط مباشر أو رابط من تيك توك، اتركه فارغاً لإلغاء هذه الميزة</label>
                                 <div class="flex gap-2 mb-3">
                                     <input type="url" id="setting-intro-url" class="flex-1 px-4 py-2 rounded bg-dark-900 border border-dark-600 text-white text-left text-sm" dir="ltr" placeholder="رابط مقطع الترحيب / تتر البداية">
-                                    <button type="button" onclick="testIntro()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded transition" title="تجربة التتر"><i class="fas fa-play"></i></button>
+                                    <button type="button" onclick="window.testIntro()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded transition" title="تجربة التتر"><i class="fas fa-play"></i></button>
                                 </div>
                             </div>
                             
@@ -410,12 +410,12 @@
                                 <label class="block text-sm text-gray-300 mb-2">رابط أذان الفجر (مخصص)</label>
                                 <div class="flex gap-2 mb-3">
                                     <input type="url" id="setting-adhan-fajr" class="flex-1 px-4 py-2 rounded bg-dark-900 border border-dark-600 text-white text-left" dir="ltr">
-                                    <button type="button" onclick="testAdhan('الفجر')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded transition"><i class="fas fa-play"></i></button>
+                                    <button type="button" onclick="window.testAdhan('الفجر')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded transition"><i class="fas fa-play"></i></button>
                                 </div>
                                 <label class="block text-sm text-gray-300 mb-2">رابط الأذان لباقي الصلوات</label>
                                 <div class="flex gap-2">
                                     <input type="url" id="setting-adhan-general" class="flex-1 px-4 py-2 rounded bg-dark-900 border border-dark-600 text-white text-left" dir="ltr">
-                                    <button type="button" onclick="testAdhan('العشاء')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded transition"><i class="fas fa-play"></i></button>
+                                    <button type="button" onclick="window.testAdhan('العشاء')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded transition"><i class="fas fa-play"></i></button>
                                 </div>
                             </div>
 
@@ -443,7 +443,7 @@
                                     <span id="ticker-speed-val" class="text-gold-400 text-xs font-mono">30s</span>
                                 </div>
                             </div>
-                            <button onclick="saveSettings()" class="bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold py-2 px-6 rounded transition mt-4 w-full">حفظ جميع الإعدادات</button>
+                            <button onclick="window.saveSettings()" class="bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold py-2 px-6 rounded transition mt-4 w-full">حفظ جميع الإعدادات</button>
                         </div>
                     </div>
 
@@ -460,7 +460,7 @@
                             </div>
                             <div class="flex items-end gap-2">
                                 <button type="submit" id="cat-submit" class="bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold py-2 px-4 rounded h-10">إضافة</button>
-                                <button type="button" onclick="resetCatForm()" class="bg-dark-600 hover:bg-dark-500 text-white font-bold py-2 px-4 rounded h-10 hidden" id="cat-cancel">إلغاء</button>
+                                <button type="button" onclick="window.resetCatForm()" class="bg-dark-600 hover:bg-dark-500 text-white font-bold py-2 px-4 rounded h-10 hidden" id="cat-cancel">إلغاء</button>
                             </div>
                         </form>
                         <div id="admin-cats-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
@@ -473,7 +473,7 @@
                         <form id="track-form" class="bg-dark-900 p-3 rounded border border-dark-600 mb-4 shrink-0 grid grid-cols-1 md:grid-cols-4 gap-3">
                             <input type="hidden" id="trk-id">
                             <div class="md:col-span-2">
-                                <input type="url" id="trk-url" required placeholder="رابط المصدر المباشر أو تيك توك" class="w-full px-3 py-2 rounded bg-dark-800 border border-dark-500 text-white focus:border-gold-500 outline-none text-left text-sm" dir="ltr" oninput="autoExtractName(this.value)">
+                                <input type="url" id="trk-url" required placeholder="رابط المصدر المباشر أو تيك توك" class="w-full px-3 py-2 rounded bg-dark-800 border border-dark-500 text-white focus:border-gold-500 outline-none text-left text-sm" dir="ltr" oninput="window.autoExtractName(this.value)">
                             </div>
                             <div>
                                 <input type="text" id="trk-name" required placeholder="اسم التلاوة" class="w-full px-3 py-2 rounded bg-dark-800 border border-dark-500 text-white focus:border-gold-500 outline-none text-sm">
@@ -481,7 +481,7 @@
                             <div class="flex gap-2">
                                 <select id="trk-cat" required class="w-full px-3 py-2 rounded bg-dark-800 border border-dark-500 text-white focus:border-gold-500 outline-none text-sm"></select>
                                 <button type="submit" id="trk-submit" class="bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold px-4 text-sm whitespace-nowrap rounded"><i class="fas fa-plus"></i> إضافة</button>
-                                <button type="button" onclick="resetTrackForm()" class="bg-dark-600 hover:bg-dark-500 text-white font-bold px-3 hidden rounded" id="trk-cancel"><i class="fas fa-times"></i></button>
+                                <button type="button" onclick="window.resetTrackForm()" class="bg-dark-600 hover:bg-dark-500 text-white font-bold px-3 hidden rounded" id="trk-cancel"><i class="fas fa-times"></i></button>
                             </div>
                         </form>
                         
@@ -490,27 +490,27 @@
                                 <h4 class="font-bold text-gold-400">سجل المقاطع</h4>
                                 <span id="selected-count" class="text-xs bg-dark-700 px-2 py-1 rounded text-white hidden">محدد: 0</span>
                             </div>
-                            <input type="text" id="admin-search-track" placeholder="بحث..." class="bg-dark-900 border border-dark-600 rounded px-3 py-1 text-sm text-white focus:border-gold-500 w-1/3" onkeyup="renderAdminTracks()">
+                            <input type="text" id="admin-search-track" placeholder="بحث..." class="bg-dark-900 border border-dark-600 rounded px-3 py-1 text-sm text-white focus:border-gold-500 w-1/3" onkeyup="window.renderAdminTracks()">
                         </div>
 
                         <div id="bulk-toolbar" class="hidden bg-dark-700 border border-gold-500/30 p-2 rounded-t mb-0 shrink-0 flex flex-wrap gap-3 items-center">
                             <span class="text-sm font-bold text-gold-500 ml-2"><i class="fas fa-magic"></i> إجراءات جماعية:</span>
                             <div class="flex items-center gap-1">
                                 <select id="bulk-cat" class="text-sm px-2 py-1 rounded bg-dark-800 text-white border border-dark-500 outline-none"></select>
-                                <button onclick="bulkChangeCategory()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1 rounded font-bold transition">نقل</button>
+                                <button onclick="window.bulkChangeCategory()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1 rounded font-bold transition">نقل</button>
                             </div>
                             <div class="flex items-center gap-1 border-r border-dark-500 pr-3">
                                 <input type="text" id="bulk-rename-base" placeholder="الاسم الأساسي..." class="text-sm px-2 py-1 rounded bg-dark-800 text-white border border-dark-500 outline-none w-32">
-                                <button onclick="bulkRename()" class="bg-green-600 hover:bg-green-500 text-white text-xs px-3 py-1 rounded font-bold transition">إعادة تسمية</button>
+                                <button onclick="window.bulkRename()" class="bg-green-600 hover:bg-green-500 text-white text-xs px-3 py-1 rounded font-bold transition">إعادة تسمية</button>
                             </div>
-                            <button onclick="bulkDelete()" class="mr-auto bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1 rounded font-bold transition"><i class="fas fa-trash"></i> حذف</button>
+                            <button onclick="window.bulkDelete()" class="mr-auto bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1 rounded font-bold transition"><i class="fas fa-trash"></i> حذف</button>
                         </div>
 
                         <div class="flex-1 overflow-y-auto custom-scroll bg-dark-900 rounded-b border border-dark-600 shadow-inner relative min-h-[300px]">
                             <table class="w-full text-sm text-right text-gray-300">
                                 <thead class="text-xs text-gold-500 bg-dark-800 sticky top-0 z-10 shadow-md border-b border-dark-600">
                                     <tr>
-                                        <th class="px-3 py-3 w-10 text-center"><input type="checkbox" id="check-all" class="custom-checkbox" onclick="toggleAllTracks(this)"></th>
+                                        <th class="px-3 py-3 w-10 text-center"><input type="checkbox" id="check-all" class="custom-checkbox" onclick="window.toggleAllTracks(this)"></th>
                                         <th class="px-4 py-3">الاسم</th>
                                         <th class="px-4 py-3">القسم</th>
                                         <th class="px-4 py-3 text-center w-24">إجراءات</th>
@@ -542,7 +542,7 @@
                                         <input type="text" id="import-base-name" placeholder="مثال: الشيخ عبد الباسط المقطع" class="w-full px-4 py-2 rounded bg-dark-800 border border-dark-500 text-white focus:border-gold-500 outline-none">
                                     </div>
                                 </div>
-                                <button onclick="startBulkImport()" id="btn-import" class="w-full bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold py-3 rounded transition flex justify-center items-center gap-2 mt-4">
+                                <button onclick="window.startBulkImport()" id="btn-import" class="w-full bg-gold-600 hover:bg-gold-500 text-dark-900 font-bold py-3 rounded transition flex justify-center items-center gap-2 mt-4">
                                     <i class="fas fa-cloud-download-alt"></i> بدء سحب المقاطع
                                 </button>
                                 
@@ -562,11 +562,11 @@
         </div>
     </main>
 
-    <!-- Firebase Integration & Main Logic -->
+    <!-- Firebase Integration -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDs0hSOIHyHfEZ5Z1-fN8SiEbDHV7SX91k",
@@ -583,20 +583,58 @@
         const db = getFirestore(app);
 
         const customAppId = 'quran_app_v1';
-        const quranDocRef = doc(db, 'artifacts', customAppId, 'public', 'data', 'quran_data', 'main');
+        
+        // استخدام Collection بالكامل لتخزين المقاطع في ملفات مقسمة (Chunks) لتجاوز الحد الأقصى لـ Firebase
+        const quranColRef = collection(db, 'artifacts', customAppId, 'public', 'data', 'quran_data_chunks');
         let currentUser = null;
 
+        // نظام الحفظ الذكي المُقسم (Dynamic Chunking Engine)
         window.firebaseSaveData = async (data) => {
             if (!currentUser) return;
             try {
-                if (typeof LZString !== 'undefined') {
-                    const compressedData = LZString.compressToUTF16(JSON.stringify(data));
-                    await setDoc(quranDocRef, { payload: compressedData, isCompressed: true });
-                } else {
-                    await setDoc(quranDocRef, { payload: JSON.stringify(data), isCompressed: false, isStringified: true });
+                // إعطاء طابع زمني لمعرفة النسخة الأحدث
+                const currentTimestamp = Date.now();
+                data.lastUpdated = currentTimestamp;
+
+                // 1. حفظ الإعدادات والأقسام في ملف رئيسي
+                const metaData = {
+                    settings: data.settings,
+                    categories: data.categories,
+                    lastUpdated: currentTimestamp,
+                    isMeta: true
+                };
+                
+                await setDoc(doc(quranColRef, 'main'), {
+                    payload: LZString.compressToBase64(JSON.stringify(metaData)),
+                    isCompressedBase64: true
+                });
+
+                // 2. تقطيع المقاطع (كل 1500 مقطع في ملف) لتجنب مشكلة الـ 20,000 Index في Firebase
+                const CHUNK_SIZE = 1500;
+                const trackChunks = [];
+                for (let i = 0; i < data.tracks.length; i += CHUNK_SIZE) {
+                    trackChunks.push(data.tracks.slice(i, i + CHUNK_SIZE));
                 }
+
+                // رفع الملفات المقطعة
+                for (let i = 0; i < trackChunks.length; i++) {
+                    await setDoc(doc(quranColRef, 'tracks_chunk_' + i), {
+                        payload: LZString.compressToBase64(JSON.stringify(trackChunks[i])),
+                        isCompressedBase64: true,
+                        chunkIndex: i
+                    });
+                }
+                
+                // مسح الملفات الزائدة (إن وجد) بتفريغها للحفاظ على النظام
+                for (let i = trackChunks.length; i < 15; i++) {
+                     await setDoc(doc(quranColRef, 'tracks_chunk_' + i), {
+                        payload: LZString.compressToBase64(JSON.stringify([])),
+                        isCompressedBase64: true
+                    });
+                }
+
             } catch (error) {
-                console.error("خطأ أثناء الحفظ في قاعدة البيانات:", error);
+                console.error("خطأ أثناء حفظ البيانات المقسمة:", error);
             }
         };
 
@@ -608,29 +646,63 @@
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
-                onSnapshot(quranDocRef, (docSnap) => {
-                    if (docSnap.exists()) {
-                        const cloudData = docSnap.data();
-                        if (window.updateAppDataFromFirebase) {
-                            if (cloudData.isCompressed && cloudData.payload) {
-                                try {
-                                    if (typeof LZString !== 'undefined') {
-                                        const decompressed = JSON.parse(LZString.decompressFromUTF16(cloudData.payload));
-                                        window.updateAppDataFromFirebase(decompressed);
-                                    }
-                                } catch(e) { console.error("Decompression failed", e); }
-                            } else if (cloudData.isStringified && cloudData.payload) {
-                                try {
-                                    const parsed = JSON.parse(cloudData.payload);
-                                    window.updateAppDataFromFirebase(parsed);
-                                } catch(e) { console.error("Parse failed", e); }
-                            } else {
-                                window.updateAppDataFromFirebase(cloudData);
+                // استماع ذكي للملفات المقطعة
+                onSnapshot(quranColRef, (snapshot) => {
+                    if (snapshot.empty) {
+                        // لو الفايربيز فاضي، ارفع المحلي
+                        const localDataStr = localStorage.getItem('quran_pro_data_v4');
+                        if (localDataStr) {
+                            let parsed = JSON.parse(localDataStr);
+                            parsed.lastUpdated = Date.now();
+                            window.firebaseSaveData(parsed);
+                        }
+                        return;
+                    }
+
+                    let cloudMeta = null;
+                    let cloudTracks = [];
+
+                    snapshot.forEach(docSnap => {
+                        const d = docSnap.data();
+                        let parsedObj = null;
+                        
+                        try {
+                            if (d.isCompressedBase64 && d.payload) {
+                                parsedObj = JSON.parse(LZString.decompressFromBase64(d.payload));
+                            }
+                        } catch(e) { console.error("Decompression failed for doc:", docSnap.id); }
+
+                        if (parsedObj) {
+                            if (docSnap.id === 'main') {
+                                cloudMeta = parsedObj;
+                            } else if (docSnap.id.startsWith('tracks_chunk_')) {
+                                if (Array.isArray(parsedObj)) {
+                                    cloudTracks = cloudTracks.concat(parsedObj);
+                                }
                             }
                         }
-                    } else {
-                        const localDataStr = localStorage.getItem('quran_pro_data_v4');
-                        if (localDataStr) window.firebaseSaveData(JSON.parse(localDataStr));
+                    });
+
+                    if (cloudMeta && window.updateAppDataFromFirebase) {
+                        const assembledCloudData = {
+                            settings: cloudMeta.settings,
+                            categories: cloudMeta.categories,
+                            tracks: cloudTracks,
+                            lastUpdated: cloudMeta.lastUpdated || 0
+                        };
+
+                        // نظام التعافي وحل صراعات المزامنة
+                        let localDataStr = localStorage.getItem('quran_pro_data_v4');
+                        let localData = localDataStr ? JSON.parse(localDataStr) : null;
+                        let localTime = (localData && localData.lastUpdated) ? localData.lastUpdated : 0;
+
+                        // تحديث المتصفح فقط إذا كانت نسخة الفايربيز "أحدث أو تساوي" نسخة المتصفح
+                        if (assembledCloudData.lastUpdated >= localTime) {
+                            window.updateAppDataFromFirebase(assembledCloudData);
+                        } else if (localData) {
+                            // إذا كانت نسخة المتصفح "أحدث" (لأن الفايربيز فشل في الحفظ مسبقاً)، نفرض نسخة المتصفح على الفايربيز!
+                            window.firebaseSaveData(localData);
+                        }
                     }
                 }, (error) => console.error("Live Sync error:", error));
             }
@@ -638,7 +710,7 @@
     </script>
 
     <script>
-        // تعريف المتغيرات الأساسية للواجهة لتجنب أي أخطاء (Uncaught ReferenceError)
+        // تعريف المتغيرات الأساسية للواجهة
         const recordLogo = document.getElementById('record-logo-container');
         const playIcon = document.getElementById('play-icon');
         const seekBar = document.getElementById('seek-bar');
@@ -662,7 +734,8 @@
                 stereo: '0'      
             },
             categories: [ { id: 'cat_1', name: 'تلاوات خاشعة', color: '#d4af37' }, { id: 'cat_2', name: 'المصحف المرتل', color: '#34a667' } ],
-            tracks: [ { id: 'trk_1', title: 'سورة الملك - تلاوة هادئة', catId: 'cat_1', url: 'https://ia802909.us.archive.org/34/items/TvQuran.com__1/TvQuran.com__067.mp3', playCount: 5, dateAdded: Date.now() } ]
+            tracks: [ { id: 'trk_1', title: 'سورة الملك - تلاوة هادئة', catId: 'cat_1', url: 'https://ia802909.us.archive.org/34/items/TvQuran.com__1/TvQuran.com__067.mp3', playCount: 5, dateAdded: Date.now() } ],
+            lastUpdated: Date.now()
         };
 
         function sanitizeData(data) {
@@ -670,7 +743,8 @@
             let sanitized = {
                 settings: Object.assign({}, DEFAULT_DATA.settings, data.settings || {}),
                 categories: Array.isArray(data.categories) && data.categories.length > 0 ? data.categories : [...DEFAULT_DATA.categories],
-                tracks: Array.isArray(data.tracks) ? data.tracks : []
+                tracks: Array.isArray(data.tracks) ? data.tracks : [],
+                lastUpdated: data.lastUpdated || Date.now()
             };
             const validCatIds = sanitized.categories.map(c => c.id);
             const defaultCatId = sanitized.categories[0].id;
@@ -693,12 +767,12 @@
         const EN_AR_DICT = { 'al fatihah': 'الفاتحة', 'al baqarah': 'البقرة', 'surah': 'سورة', 'abdul basit': 'عبد الباسط' };
 
         function saveData() {
+            appData.lastUpdated = Date.now();
             localStorage.setItem('quran_pro_data_v4', JSON.stringify(appData));
             updateStats();
             if (window.firebaseSaveData) window.firebaseSaveData(appData);
         }
         
-        // دالة تنظيف وتعديل الأسماء وإضافتها لتجنب خطأ (autoCleanName is not defined)
         function autoCleanName(str) {
             if (!str) return "تلاوة جديدة";
             let clean = decodeURIComponent(str.split('/').pop().split('?')[0]).replace(/\.(mp3|wav|m4a|ogg)$/i, '').replace(/tvquran\.com/gi, ' ').replace(/128kbps/gi, ' ').replace(/64kbps/gi, ' ').replace(/_+/g, ' ').replace(/-+/g, ' ').replace(/^\d+\s*/, '');
@@ -867,7 +941,6 @@
         // ==========================================
         async function updateVisitorCount() {
             try {
-                // تجاوز الحظر باستخدام try/catch صامت لأنه قد يتم حظره بسبب Local File (file:///)
                 let isVisited = sessionStorage.getItem('has_visited');
                 let url = `https://api.counterapi.dev/v1/quran-player-rare-2026/visits`;
                 if(!isVisited) { url += '/up'; sessionStorage.setItem('has_visited', 'true'); }
@@ -876,7 +949,7 @@
                 globalVisitorCount = data.count || '---';
                 updateStats();
             } catch (err) {
-                console.log("تنويه: تعمل من ملف محلي، لذا تم حظر العداد.");
+                console.log("تنويه: حظر العداد.");
             }
         }
 
@@ -889,9 +962,9 @@
                 <div class="flex items-center gap-2 text-gold-500">|</div>
                 <div class="flex items-center gap-2"><i class="fas fa-users text-gold-600"></i> الزوار: <b class="text-white">${globalVisitorCount}</b></div>
                 <div class="flex items-center gap-2 text-gold-500">|</div>
-                <div class="flex items-center gap-2"><i class="fas fa-fire text-gold-600"></i> الأعلى: ${top ? `<span onclick="playTrack('${top.id}')" class="cursor-pointer text-gold-400 hover:text-white underline">${top.title}</span>` : ''}</div>
+                <div class="flex items-center gap-2"><i class="fas fa-fire text-gold-600"></i> الأعلى: ${top ? `<span onclick="window.playTrack('${top.id}')" class="cursor-pointer text-gold-400 hover:text-white underline">${top.title}</span>` : ''}</div>
                 <div class="flex items-center gap-2 text-gold-500">|</div>
-                <div class="flex items-center gap-2"><i class="fas fa-clock text-gold-600"></i> الأحدث: ${latest ? `<span onclick="playTrack('${latest.id}')" class="cursor-pointer text-gold-400 hover:text-white underline">${latest.title}</span>` : ''}</div>
+                <div class="flex items-center gap-2"><i class="fas fa-clock text-gold-600"></i> الأحدث: ${latest ? `<span onclick="window.playTrack('${latest.id}')" class="cursor-pointer text-gold-400 hover:text-white underline">${latest.title}</span>` : ''}</div>
             `;
             document.documentElement.style.setProperty('--ticker-speed', (appData.settings.tickerSpeed || 30) + 's');
         }
@@ -935,7 +1008,7 @@
                 userFavorites.push(id);
             }
             localStorage.setItem('quran_user_favorites_v1', JSON.stringify(userFavorites)); 
-            renderPlaylist(document.getElementById('search-input').value, false);
+            window.renderPlaylist(document.getElementById('search-input').value, false);
         }
         
         window.moveFavorite = function(e, id, dir) {
@@ -948,7 +1021,7 @@
                     [userFavorites[idx+1], userFavorites[idx]] = [userFavorites[idx], userFavorites[idx+1]];
                 }
                 localStorage.setItem('quran_user_favorites_v1', JSON.stringify(userFavorites)); 
-                renderPlaylist(document.getElementById('search-input').value, false);
+                window.renderPlaylist(document.getElementById('search-input').value, false);
             }
         }
 
@@ -976,7 +1049,7 @@
                 const favTracks = favTracksAll.slice(0, limit);
 
                 html += `<div class="bg-dark-800 rounded-xl border border-rose-500/30 overflow-hidden mb-5 shadow-lg">
-                            <button onclick="toggleAccordion('acc_fav')" class="w-full px-4 py-4 flex justify-between bg-dark-700 hover:bg-dark-600 border-r-4 border-rose-500">
+                            <button onclick="window.toggleAccordion('acc_fav')" class="w-full px-4 py-4 flex justify-between bg-dark-700 hover:bg-dark-600 border-r-4 border-rose-500">
                                 <div class="flex gap-3"><i class="fas fa-heart text-rose-600"></i><span class="font-bold text-white">المفضلة</span><span class="bg-dark-900 text-rose-500 text-xs px-2 py-1 rounded-full">${favTracksAll.length}</span></div>
                                 <i class="fas fa-chevron-down text-gray-400" id="icon_acc_fav"></i>
                             </button>
@@ -987,17 +1060,17 @@
                 
                 favTracks.forEach((t, i) => {
                     html += `
-                    <li id="li_${t.id}_favorites" class="p-2 flex items-center justify-between cursor-pointer transition rounded hover:bg-dark-700" onclick="playTrack('${t.id}', 'favorites')">
+                    <li id="li_${t.id}_favorites" class="p-2 flex items-center justify-between cursor-pointer transition rounded hover:bg-dark-700" onclick="window.playTrack('${t.id}', 'favorites')">
                         <div class="flex gap-3 flex-1 overflow-hidden">
                             <div class="w-10 h-10 rounded-full bg-dark-900 border border-dark-500 flex items-center justify-center shrink-0"><i class="fas fa-play text-gray-400"></i></div>
                             <h4 class="font-bold text-gray-300 truncate">${t.title}</h4>
                         </div>
                         <div class="flex gap-2 shrink-0">
                             <div class="flex flex-col gap-1 border-l border-dark-600 pl-2">
-                                <button onclick="moveFavorite(event,'${t.id}','up')" class="text-gray-500 hover:text-white text-xs"><i class="fas fa-chevron-up"></i></button>
-                                <button onclick="moveFavorite(event,'${t.id}','down')" class="text-gray-500 hover:text-white text-xs"><i class="fas fa-chevron-down"></i></button>
+                                <button onclick="window.moveFavorite(event,'${t.id}','up')" class="text-gray-500 hover:text-white text-xs"><i class="fas fa-chevron-up"></i></button>
+                                <button onclick="window.moveFavorite(event,'${t.id}','down')" class="text-gray-500 hover:text-white text-xs"><i class="fas fa-chevron-down"></i></button>
                             </div>
-                            <button onclick="toggleFavorite(event,'${t.id}')" class="text-rose-600 p-2"><i class="fas fa-heart"></i></button>
+                            <button onclick="window.toggleFavorite(event,'${t.id}')" class="text-rose-600 p-2"><i class="fas fa-heart"></i></button>
                         </div>
                     </li>`;
                 });
@@ -1017,7 +1090,7 @@
                 const catTracks = catTracksAll.slice(0, limit);
 
                 html += `<div class="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden mb-3">
-                            <button onclick="toggleAccordion('acc_${cat.id}')" class="w-full px-4 py-4 flex justify-between bg-dark-700 hover:bg-dark-600" style="border-right:4px solid ${cat.color}">
+                            <button onclick="window.toggleAccordion('acc_${cat.id}')" class="w-full px-4 py-4 flex justify-between bg-dark-700 hover:bg-dark-600" style="border-right:4px solid ${cat.color}">
                                 <div class="flex gap-3"><i class="fas fa-folder" style="color:${cat.color}"></i><span class="font-bold text-white">${cat.name}</span><span class="bg-dark-900 text-gray-400 text-xs px-2 py-1 rounded-full">${catTracksAll.length}</span></div>
                                 <i class="fas fa-chevron-down text-gray-400" id="icon_acc_${cat.id}"></i>
                             </button>
@@ -1029,14 +1102,14 @@
                 catTracks.forEach(t => {
                     const isFav = userFavorites.includes(t.id);
                     html += `
-                    <li id="li_${t.id}_category" class="p-2 flex items-center justify-between cursor-pointer transition rounded hover:bg-dark-700" onclick="playTrack('${t.id}', 'category')">
+                    <li id="li_${t.id}_category" class="p-2 flex items-center justify-between cursor-pointer transition rounded hover:bg-dark-700" onclick="window.playTrack('${t.id}', 'category')">
                         <div class="flex gap-3 flex-1 overflow-hidden">
                             <div class="w-10 h-10 rounded-full bg-dark-900 border border-dark-500 flex items-center justify-center shrink-0"><i class="fas fa-play text-gray-400"></i></div>
                             <h4 class="font-bold text-gray-300 truncate">${t.title}</h4>
                         </div>
                         <div class="flex gap-3 shrink-0">
                             <span class="text-xs text-gray-500 hidden md:inline"><i class="fas fa-headphones"></i> ${t.playCount||0}</span>
-                            <button onclick="toggleFavorite(event,'${t.id}')" class="text-gray-400 hover:text-rose-500 p-2"><i class="${isFav?'fas text-rose-600':'far'} fa-heart text-lg"></i></button>
+                            <button onclick="window.toggleFavorite(event,'${t.id}')" class="text-gray-400 hover:text-rose-500 p-2"><i class="${isFav?'fas text-rose-600':'far'} fa-heart text-lg"></i></button>
                         </div>
                     </li>`;
                 });
@@ -1067,7 +1140,7 @@
 
         window.loadMore = function(catId) {
             window.catLimits[catId] = (window.catLimits[catId] || ITEMS_PER_PAGE) + ITEMS_PER_PAGE;
-            renderPlaylist(document.getElementById('search-input').value, false);
+            window.renderPlaylist(document.getElementById('search-input').value, false);
         };
 
         window.toggleAccordion = function(id) {
@@ -1219,7 +1292,7 @@
 
         document.getElementById('btn-play-pause').addEventListener('click', () => { 
             introAudioEl.pause(); 
-            currentTrackId ? (initAudioContext(), activeAudio.paused ? activeAudio.play() : activeAudio.pause()) : (appData.tracks.length && playTrack(appData.tracks[0].id)); 
+            currentTrackId ? (initAudioContext(), activeAudio.paused ? activeAudio.play() : activeAudio.pause()) : (appData.tracks.length && window.playTrack(appData.tracks[0].id)); 
         });
 
         function updatePlayState() { 
@@ -1239,7 +1312,7 @@
                 const list = currentPlaylistContext==='favorites' ? userFavorites.map(fid=>appData.tracks.find(t=>t.id===fid)).filter(Boolean) : appData.tracks.filter(t=>t.catId===trk.catId);
                 if(list.length>0) { 
                     const i = list.findIndex(t=>t.id===currentTrackId); 
-                    if(i > -1) playTrack(list[i+1<list.length?i+1:0].id, currentPlaylistContext); 
+                    if(i > -1) window.playTrack(list[i+1<list.length?i+1:0].id, currentPlaylistContext); 
                 }
             }
         }
@@ -1274,7 +1347,7 @@
         };
         window.checkPassword = function() { 
             if(document.getElementById('admin-password').value==='2112') { 
-                closeModal('login-modal'); 
+                window.closeModal('login-modal'); 
                 document.getElementById('dashboard-modal').classList.remove('hidden'); 
                 initDashboard(); 
             } else alert("خطأ!"); 
@@ -1295,8 +1368,8 @@
             document.getElementById('setting-adhan-fajr').value = appData.settings.adhanUrlFajr||''; 
             document.getElementById('setting-adhan-general').value = appData.settings.adhanUrlGeneral||''; 
             document.getElementById('setting-ticker-speed').value = appData.settings.tickerSpeed||30;
-            renderAdminCats(); 
-            renderAdminTracks();
+            window.renderAdminCats(); 
+            window.renderAdminTracks();
         }
         
         window.saveSettings = function() {
@@ -1333,10 +1406,10 @@
                 `<div class="bg-dark-800 p-3 rounded border border-dark-600 flex justify-between items-center" style="border-right:4px solid ${c.color}">
                     <span class="text-white font-bold">${c.name}</span>
                     <div class="gap-2 flex items-center">
-                        <button onclick="moveCategory(${i},-1)" class="text-gray-400 hover:text-white px-1"><i class="fas fa-arrow-up"></i></button>
-                        <button onclick="moveCategory(${i},1)" class="text-gray-400 hover:text-white px-1 border-l border-dark-600 pl-2"><i class="fas fa-arrow-down"></i></button>
-                        <button onclick="editCat('${c.id}')" class="text-blue-400 hover:text-blue-300 px-2"><i class="fas fa-edit"></i></button>
-                        <button onclick="deleteCat('${c.id}')" class="text-red-400 hover:text-red-300 px-2"><i class="fas fa-trash"></i></button>
+                        <button onclick="window.moveCategory(${i},-1)" class="text-gray-400 hover:text-white px-1"><i class="fas fa-arrow-up"></i></button>
+                        <button onclick="window.moveCategory(${i},1)" class="text-gray-400 hover:text-white px-1 border-l border-dark-600 pl-2"><i class="fas fa-arrow-down"></i></button>
+                        <button onclick="window.editCat('${c.id}')" class="text-blue-400 hover:text-blue-300 px-2"><i class="fas fa-edit"></i></button>
+                        <button onclick="window.deleteCat('${c.id}')" class="text-red-400 hover:text-red-300 px-2"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`
             ).join('');
@@ -1352,7 +1425,7 @@
             if(n<0||n>=appData.categories.length) return; 
             [appData.categories[i], appData.categories[n]] = [appData.categories[n], appData.categories[i]]; 
             saveData(); 
-            renderAdminCats(); 
+            window.renderAdminCats(); 
             window.renderPlaylist(document.getElementById('search-input').value, false); 
         }
 
@@ -1372,7 +1445,7 @@
                 }
                 
                 saveData(); 
-                renderAdminCats(); 
+                window.renderAdminCats(); 
                 window.resetCatForm(); 
                 window.renderPlaylist(document.getElementById('search-input').value, false); 
             });
@@ -1394,8 +1467,8 @@
                 appData.categories = appData.categories.filter(c=>c.id!==id); 
                 appData.tracks = appData.tracks.filter(t=>t.catId!==id); 
                 saveData(); 
-                renderAdminCats(); 
-                renderAdminTracks(); 
+                window.renderAdminCats(); 
+                window.renderAdminTracks(); 
                 window.renderPlaylist(document.getElementById('search-input').value, false); 
             } 
         }
@@ -1413,10 +1486,10 @@
             const q = document.getElementById('admin-search-track').value.toLowerCase();
             document.getElementById('admin-tracks-list').innerHTML = appData.tracks.filter(t=>t.title.toLowerCase().includes(q)||t.url.includes(q)).slice(0,200).map(t => 
                 `<tr class="hover:bg-dark-700 transition">
-                    <td class="px-3 py-2 text-center"><input type="checkbox" class="track-checkbox custom-checkbox" value="${t.id}" onchange="updateBulkUI()"></td>
-                    <td class="px-4 py-2 text-white font-bold cursor-pointer hover:text-gold-400" onclick="editAdminTrack('${t.id}')">${t.title}</td>
+                    <td class="px-3 py-2 text-center"><input type="checkbox" class="track-checkbox custom-checkbox" value="${t.id}" onchange="window.updateBulkUI()"></td>
+                    <td class="px-4 py-2 text-white font-bold cursor-pointer hover:text-gold-400" onclick="window.editAdminTrack('${t.id}')">${t.title}</td>
                     <td class="px-4 py-2 text-gray-400">${appData.categories.find(c=>c.id===t.catId)?.name||'بدون قسم'}</td>
-                    <td class="px-4 py-2 text-center"><button onclick="deleteAdminTrack('${t.id}')" class="text-red-400 hover:text-red-300 px-2"><i class="fas fa-trash"></i></button></td>
+                    <td class="px-4 py-2 text-center"><button onclick="window.deleteAdminTrack('${t.id}')" class="text-red-400 hover:text-red-300 px-2"><i class="fas fa-trash"></i></button></td>
                 </tr>`
             ).join('');
             document.getElementById('check-all').checked = false; 
@@ -1449,7 +1522,7 @@
             if(ids.length && confirm(`حذف ${ids.length}؟`)){ 
                 appData.tracks = appData.tracks.filter(t=>!ids.includes(t.id)); 
                 saveData(); 
-                renderAdminTracks(); 
+                window.renderAdminTracks(); 
                 window.renderPlaylist(document.getElementById('search-input').value, false); 
             } 
         }
@@ -1463,7 +1536,7 @@
                     if(t) t.catId = c;
                 }); 
                 saveData(); 
-                renderAdminTracks(); 
+                window.renderAdminTracks(); 
                 window.renderPlaylist(document.getElementById('search-input').value, false); 
                 alert('تم النقل!'); 
             } 
@@ -1479,7 +1552,7 @@
                     if(t) { t.title = `${b} ${c++}`; }
                 }); 
                 saveData(); 
-                renderAdminTracks(); 
+                window.renderAdminTracks(); 
                 window.renderPlaylist(document.getElementById('search-input').value, false); 
                 document.getElementById('bulk-rename-base').value=''; 
             } 
@@ -1501,7 +1574,7 @@
             if(confirm('حذف؟')){ 
                 appData.tracks = appData.tracks.filter(t=>t.id!==id); 
                 saveData(); 
-                renderAdminTracks(); 
+                window.renderAdminTracks(); 
                 window.renderPlaylist(document.getElementById('search-input').value, false); 
             } 
         }
@@ -1532,7 +1605,7 @@
                     appData.tracks.unshift({id:'trk_'+Date.now(), title, url, catId, playCount:0, dateAdded:Date.now()}); 
                 }
                 saveData(); 
-                renderAdminTracks(); 
+                window.renderAdminTracks(); 
                 window.resetTrackForm(); 
                 window.renderPlaylist(document.getElementById('search-input').value, false); 
             });
@@ -1572,7 +1645,7 @@
                         msg.textContent = `تم استيراد مقطع تيك توك بنجاح!`; 
                         msg.className = 'text-green-400 font-bold'; 
                         saveData(); 
-                        renderAdminTracks(); 
+                        window.renderAdminTracks(); 
                         window.renderPlaylist(document.getElementById('search-input').value, false);
                         
                         setTimeout(()=>{ 
@@ -1626,7 +1699,7 @@
                 msg.textContent = `تم استيراد ${added} مقطع!`; 
                 msg.className = 'text-green-400 font-bold'; 
                 saveData(); 
-                renderAdminTracks(); 
+                window.renderAdminTracks(); 
                 window.renderPlaylist(document.getElementById('search-input').value, false);
                 
                 setTimeout(() => { 
